@@ -33,9 +33,17 @@
 }
 
 .brand p {
-  margin: 0.2rem 0 1rem;
+  margin: 0.2rem 0 0.3rem;
   color: var(--color-text-secondary);
   font-size: 0.88rem;
+}
+
+.brand p.version {
+  margin: 0 0 1rem;
+  color: var(--color-text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .menu {

@@ -2,6 +2,7 @@ export interface Translations {
   app: {
     title: string;
     subtitle: string;
+    version: string;
     loading: string;
   };
 

@@ -844,6 +844,7 @@ function App() {
         <div className="brand">
           <h1>{t.app.title}</h1>
           <p>{t.app.subtitle}</p>
+          <p className="version">{t.app.version}</p>
         </div>
         <nav className="menu">
           {menuItems.map((item) => (
@@ -968,7 +969,7 @@ function App() {
                   <tbody>
                     {Array.from({ length: modelDraft.storyCount }, (_, i) => (
                       <tr key={`story-${i}`}>
-                        <td>{i + 1}</td>
+                        <td>{modelDraft.storyCount - i}</td>
                         <td>
                           <input
                             type="number"
