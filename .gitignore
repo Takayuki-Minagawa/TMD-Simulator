@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 初期依頼書
+AI_AGENT_INSTRUCTIONS.md
