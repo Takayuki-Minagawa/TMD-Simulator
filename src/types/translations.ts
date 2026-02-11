@@ -18,6 +18,7 @@ export interface Translations {
 
   topbar: {
     help: string;
+    guide: string;
     zipImport: string;
     zipExport: string;
     reset: string;
@@ -167,6 +168,18 @@ export interface Translations {
       title: string;
       content: string;
     };
+  };
+
+  welcome: {
+    title: string;
+    dismiss: string;
+    close: string;
+    sampleDataTitle: string;
+    sampleDataDesc: string;
+    workflowTitle: string;
+    workflowSteps: string;
+    dataManageTitle: string;
+    dataManageDesc: string;
   };
 
   footer: {

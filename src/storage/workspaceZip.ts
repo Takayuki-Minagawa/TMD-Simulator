@@ -4,10 +4,14 @@ import {
   triggerDownload,
 } from "@/domain/encoding.ts";
 import { listAllFiles, putFiles, normalizePath } from "@/storage/workspaceDb.ts";
+import { REQUIRED_FOLDERS } from "@/domain/types.ts";
 
 export async function exportWorkspaceZip(fileName = "tmd-workspace.zip"): Promise<void> {
   const files = await listAllFiles();
   const zip = new JSZip();
+  for (const folder of REQUIRED_FOLDERS) {
+    zip.folder(folder);
+  }
   for (const file of files) {
     zip.file(file.path, file.content);
   }

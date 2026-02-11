@@ -20,6 +20,7 @@ export const ja: Translations = {
 
   topbar: {
     help: 'ヘルプ',
+    guide: 'ガイド',
     zipImport: 'ZIP取込',
     zipExport: 'ZIP出力',
     reset: '初期化',
@@ -232,6 +233,48 @@ export const ja: Translations = {
         </ul>
       `,
     },
+  },
+
+  welcome: {
+    title: 'TMD-Simulator Web へようこそ',
+    dismiss: '今後このガイドを表示しない',
+    close: '閉じる',
+    sampleDataTitle: 'サンプルデータについて',
+    sampleDataDesc: `
+      <p>初回起動時に以下のサンプルデータが自動的に読み込まれています。</p>
+      <table>
+        <tr><td><code>model/Sample_3F_TMD.dat</code></td><td>3階建て+TMD付きサンプルモデル</td></tr>
+        <tr><td><code>Wave/Sample_Sin1.2Hz.csv</code></td><td>1.2Hz正弦波（減衰付き）入力波</td></tr>
+        <tr><td><code>ForceWave/Sample_Sin3Hz.csv</code></td><td>3Hz正弦波の強制力波</td></tr>
+      </table>
+      <p>これらを使ってすぐに解析を試すことができます。</p>
+    `,
+    workflowTitle: '解析の基本フロー',
+    workflowSteps: `
+      <ol>
+        <li><strong>Model Edit</strong> - モデルを作成または読込み</li>
+        <li><strong>Eigen Mode</strong> - 固有値解析で振動特性を確認</li>
+        <li><strong>Wave Analysis</strong> - 入力波を解析（任意）</li>
+        <li><strong>Base Response / Force Response</strong> - 時刻歴応答解析を実行</li>
+        <li><strong>Result View</strong> - 保存済み結果を再表示</li>
+      </ol>
+    `,
+    dataManageTitle: 'データの追加方法',
+    dataManageDesc: `
+      <p>入力波やモデルを追加するには<strong>ZIP入出力</strong>を使用します。</p>
+      <ol>
+        <li>画面上部の「<strong>ZIP出力</strong>」でフォルダ構成テンプレートをダウンロード</li>
+        <li>ZIPを展開し、対応フォルダにファイルを追加：
+          <ul>
+            <li><code>Wave/</code> - 入力波CSV（1列、dt=0.01s）</li>
+            <li><code>ForceWave/</code> - 強制力波CSV</li>
+            <li><code>model/</code> - モデル定義ファイル（.dat）</li>
+          </ul>
+        </li>
+        <li>ZIPに再圧縮し「<strong>ZIP取込</strong>」で読込み</li>
+      </ol>
+      <p>全データはブラウザのIndexedDBに保存されます。「ZIP出力」で定期的にバックアップを推奨します。</p>
+    `,
   },
 
   footer: {

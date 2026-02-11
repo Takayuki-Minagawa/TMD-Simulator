@@ -20,6 +20,7 @@ export const en: Translations = {
 
   topbar: {
     help: 'Help',
+    guide: 'Guide',
     zipImport: 'Import ZIP',
     zipExport: 'Export ZIP',
     reset: 'Reset',
@@ -232,6 +233,48 @@ export const en: Translations = {
         </ul>
       `,
     },
+  },
+
+  welcome: {
+    title: 'Welcome to TMD-Simulator Web',
+    dismiss: 'Do not show this guide again',
+    close: 'Close',
+    sampleDataTitle: 'Sample Data',
+    sampleDataDesc: `
+      <p>The following sample data has been automatically loaded on first launch.</p>
+      <table>
+        <tr><td><code>model/Sample_3F_TMD.dat</code></td><td>3-story building with TMD sample model</td></tr>
+        <tr><td><code>Wave/Sample_Sin1.2Hz.csv</code></td><td>1.2Hz sine wave (damped) input wave</td></tr>
+        <tr><td><code>ForceWave/Sample_Sin3Hz.csv</code></td><td>3Hz sine wave force input</td></tr>
+      </table>
+      <p>You can try analysis immediately using these samples.</p>
+    `,
+    workflowTitle: 'Basic Analysis Workflow',
+    workflowSteps: `
+      <ol>
+        <li><strong>Model Edit</strong> - Create or load a building model</li>
+        <li><strong>Eigen Mode</strong> - Check natural frequencies via eigenvalue analysis</li>
+        <li><strong>Wave Analysis</strong> - Analyze input waves (optional)</li>
+        <li><strong>Base Response / Force Response</strong> - Run time-history response analysis</li>
+        <li><strong>Result View</strong> - Review saved results</li>
+      </ol>
+    `,
+    dataManageTitle: 'How to Add Data',
+    dataManageDesc: `
+      <p>Use <strong>ZIP import/export</strong> to add input waves and models.</p>
+      <ol>
+        <li>Click "<strong>Export ZIP</strong>" at the top to download a folder structure template</li>
+        <li>Extract the ZIP and add files to the appropriate folders:
+          <ul>
+            <li><code>Wave/</code> - Input wave CSV (1 column, dt=0.01s)</li>
+            <li><code>ForceWave/</code> - Force wave CSV</li>
+            <li><code>model/</code> - Model definition files (.dat)</li>
+          </ul>
+        </li>
+        <li>Re-compress to ZIP and use "<strong>Import ZIP</strong>" to load</li>
+      </ol>
+      <p>All data is stored in the browser's IndexedDB. Regular backups via "Export ZIP" are recommended.</p>
+    `,
   },
 
   footer: {

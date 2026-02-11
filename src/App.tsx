@@ -56,6 +56,7 @@ import { storage } from "@/utils/localStorage";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { HelpManual } from "@/components/HelpManual";
+import { WelcomeDialog } from "@/components/WelcomeDialog";
 import { Favicon } from "@/components/Favicon";
 
 type MenuKey =
@@ -178,6 +179,7 @@ function App() {
   const { theme, toggleTheme } = useTheme();
   const [language, setLanguage] = useState<Language>(() => storage.getLanguage() || 'ja');
   const [showHelp, setShowHelp] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
   const t = useTranslation(language);
 
   // Persist language preference
@@ -310,6 +312,9 @@ function App() {
       await initializeWorkspace();
       await refreshFiles();
       setReady(true);
+      if (!storage.getWelcomeDismissed()) {
+        setShowWelcome(true);
+      }
     })();
   }, []);
 
@@ -879,6 +884,9 @@ function App() {
         <header className="topbar">
           <div className="notice">{notice || t.topbar.ready}</div>
           <div className="actions">
+            <button onClick={() => setShowWelcome(true)}>
+              {t.topbar.guide}
+            </button>
             <button onClick={() => setShowHelp(true)}>
               {t.topbar.help}
             </button>
@@ -1718,6 +1726,7 @@ function App() {
       </main>
 
       <HelpManual isOpen={showHelp} onClose={() => setShowHelp(false)} translations={t} />
+      <WelcomeDialog isOpen={showWelcome} onClose={() => setShowWelcome(false)} translations={t} />
       <Favicon theme={theme} />
     </div>
   );

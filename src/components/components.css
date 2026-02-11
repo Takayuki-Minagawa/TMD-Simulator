@@ -254,6 +254,68 @@
   }
 }
 
+/* Welcome Dialog Footer */
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border-default);
+  background: var(--color-bg-glass);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  background: var(--color-bg-button-hover);
+  color: var(--color-text-primary);
+}
+
+.welcome-dismiss {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  margin: 0;
+}
+
+.welcome-dismiss input[type="checkbox"] {
+  margin: 0;
+}
+
+.help-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+}
+
+.help-content table td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 0.9rem;
+}
+
+.help-content table td:first-child {
+  white-space: nowrap;
+}
+
 /* Scrollbar Styling */
 .modal-body::-webkit-scrollbar {
   width: 8px;
