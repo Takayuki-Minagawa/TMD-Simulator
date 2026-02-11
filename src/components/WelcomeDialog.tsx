@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { Translations } from '../types/translations';
 import { storage } from '../utils/localStorage';
+import { ja } from '../locales/ja';
+import { en } from '../locales/en';
 
 interface WelcomeDialogProps {
   isOpen: boolean;
@@ -14,6 +16,8 @@ export function WelcomeDialog({ isOpen, onClose, translations }: WelcomeDialogPr
   if (!isOpen) return null;
 
   const { welcome } = translations;
+  const isJa = translations === ja;
+  const secondary = isJa ? en.welcome : ja.welcome;
 
   const handleClose = () => {
     if (dismissChecked) {
@@ -33,6 +37,7 @@ export function WelcomeDialog({ isOpen, onClose, translations }: WelcomeDialogPr
         </div>
 
         <div className="modal-body">
+          {/* Primary language */}
           <section className="help-section">
             <h3>{welcome.sampleDataTitle}</h3>
             <div className="help-content" dangerouslySetInnerHTML={{ __html: welcome.sampleDataDesc }} />
@@ -46,6 +51,24 @@ export function WelcomeDialog({ isOpen, onClose, translations }: WelcomeDialogPr
           <section className="help-section">
             <h3>{welcome.dataManageTitle}</h3>
             <div className="help-content" dangerouslySetInnerHTML={{ __html: welcome.dataManageDesc }} />
+          </section>
+
+          {/* Secondary language */}
+          <hr className="welcome-divider" />
+
+          <section className="help-section">
+            <h3>{secondary.sampleDataTitle}</h3>
+            <div className="help-content" dangerouslySetInnerHTML={{ __html: secondary.sampleDataDesc }} />
+          </section>
+
+          <section className="help-section">
+            <h3>{secondary.workflowTitle}</h3>
+            <div className="help-content" dangerouslySetInnerHTML={{ __html: secondary.workflowSteps }} />
+          </section>
+
+          <section className="help-section">
+            <h3>{secondary.dataManageTitle}</h3>
+            <div className="help-content" dangerouslySetInnerHTML={{ __html: secondary.dataManageDesc }} />
           </section>
         </div>
 

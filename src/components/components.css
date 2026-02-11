@@ -286,6 +286,12 @@
   color: var(--color-text-primary);
 }
 
+.welcome-divider {
+  border: none;
+  border-top: 2px solid var(--color-border-default);
+  margin: 2rem 0;
+}
+
 .welcome-dismiss {
   display: flex;
   align-items: center;
