@@ -342,9 +342,9 @@ function App() {
       const parsed = parseModelDat(getContent(path), modelNameFromPath(path));
       setModelDraft(parsed);
       setSelectedModelPath(path);
-      setNotice(`繝｢繝・Ν隱ｭ霎ｼ: ${path}`);
+      setNotice(`モデル読込: ${path}`);
     } catch (error) {
-      setNotice(`繝｢繝・Ν隱ｭ霎ｼ繧ｨ繝ｩ繝ｼ: ${(error as Error).message}`);
+      setNotice(`モデル読込エラー: ${(error as Error).message}`);
     }
   }
 
@@ -356,7 +356,7 @@ function App() {
       storyCount: Math.min(9, Math.max(1, modelDraft.storyCount)),
     };
     await putFile(`model/${name}.dat`, serializeModelDat(normalized));
-    await setNoticeAndRefresh(`繝｢繝・Ν菫晏ｭ・ model/${name}.dat`);
+    await setNoticeAndRefresh(`モデル保存・ model/${name}.dat`);
     setSelectedModelPath(`model/${name}.dat`);
   }
 
@@ -370,9 +370,9 @@ function App() {
       const mi = model.weightsKn.map((value) => value / GRAVITY);
       const ki = model.stiffnessKnPerCm.map((value) => value * 100);
       setEigenResult(eigenWork(mi, ki));
-      setNotice(`蝗ｺ譛牙､險育ｮ怜ｮ御ｺ・ ${model.name}`);
+      setNotice(`蝗ｺ譛牙､解析怜ｮ了・ ${model.name}`);
     } catch (error) {
-      setNotice(`蝗ｺ譛牙､險育ｮ励お繝ｩ繝ｼ: ${(error as Error).message}`);
+      setNotice(`蝗ｺ譛牙､解析励おラー: ${(error as Error).message}`);
     }
   }
 
@@ -391,7 +391,7 @@ function App() {
     }
     const safeName = sineFileName.trim() || "Freq0300_001.csv";
     await putFile(`ForceWave/${safeName}`, serializeWaveCsv(sineWave));
-    await setNoticeAndRefresh(`菫晏ｭ伜ｮ御ｺ・ ForceWave/${safeName}`);
+    await setNoticeAndRefresh(`保存完了・ ForceWave/${safeName}`);
   }
 
   function analysisPathFromWave(wavePath: string): { avd: string; spectrum: string } {
@@ -422,11 +422,11 @@ function App() {
           ),
         },
       ]);
-      await setNoticeAndRefresh(`蜈･蜉帶ｳ｢隗｣譫仙ｮ御ｺ・ ${toStem(targetWavePath)}`);
+      await setNoticeAndRefresh(`入力波解析完了・ ${toStem(targetWavePath)}`);
       setWaveAnalysisResult(result);
       setExistingAvdPath(paths.avd);
     } catch (error) {
-      setNotice(`蜈･蜉帶ｳ｢隗｣譫舌お繝ｩ繝ｼ: ${(error as Error).message}`);
+      setNotice(`入力波解析エラー: ${(error as Error).message}`);
     }
   }
 
@@ -458,9 +458,9 @@ function App() {
         vmax: maxAbs(avd.vel),
         dmax: maxAbs(avd.dis),
       });
-      setNotice(`譌｢蟄伜・譫千ｵ先棡繧定ｪｭ霎ｼ: ${existingAvdPath}`);
+      setNotice(`既存解析結果を読込: ${existingAvdPath}`);
     } catch (error) {
-      setNotice(`蛻・梵邨先棡隱ｭ霎ｼ繧ｨ繝ｩ繝ｼ: ${(error as Error).message}`);
+      setNotice(`分析結果読込エラー: ${(error as Error).message}`);
     }
   }
 
@@ -500,9 +500,9 @@ function App() {
       });
       setBaseResults(results);
       setBaseActiveResultName(results[0]?.name ?? "");
-      setNotice(`蝓ｺ遉主・蜉幄ｧ｣譫仙ｮ御ｺ・ ${results.length} 繧ｱ繝ｼ繧ｹ`);
+      setNotice(`基礎入力応答解析完了・ ${results.length} ケース`);
     } catch (error) {
-      setNotice(`蝓ｺ遉主・蜉幄ｧ｣譫舌お繝ｩ繝ｼ: ${(error as Error).message}`);
+      setNotice(`基礎入力応答解析エラー: ${(error as Error).message}`);
     }
   }
 
@@ -530,7 +530,7 @@ function App() {
       }
     }
     await putFiles(payload);
-    await setNoticeAndRefresh(`邨先棡CSV蜃ｺ蜉帛ｮ御ｺ・ ${results.length} 莉ｶ`);
+    await setNoticeAndRefresh(`結果CSV出力完了・ ${results.length} 件`);
   }
 
   async function handleRunForceResponse(): Promise<void> {
@@ -574,9 +574,9 @@ function App() {
       );
       setForceResults(results);
       setForceActiveResultName(results[0]?.name ?? "");
-      setNotice(`蠑ｷ蛻ｶ蜉幄ｧ｣譫仙ｮ御ｺ・ ${results.length} 繧ｱ繝ｼ繧ｹ`);
+      setNotice(`強制力応答解析完了・ ${results.length} ケース`);
     } catch (error) {
-      setNotice(`蠑ｷ蛻ｶ蜉幄ｧ｣譫舌お繝ｩ繝ｼ: ${(error as Error).message}`);
+      setNotice(`強制力応答解析エラー: ${(error as Error).message}`);
     }
   }
 
@@ -598,9 +598,9 @@ function App() {
       );
       setViewResults(loaded);
       setViewActiveResultName(loaded[0]?.name ?? "");
-      setNotice(`蜀崎ｪｭ霎ｼ陦ｨ遉ｺ: ${loaded.length} 莉ｶ`);
+      setNotice(`蜀崎ｪｭ霎ｼ表示: ${loaded.length} 件`);
     } catch (error) {
-      setNotice(`蜀崎ｪｭ霎ｼ繧ｨ繝ｩ繝ｼ: ${(error as Error).message}`);
+      setNotice(`再読込エラー: ${(error as Error).message}`);
     }
   }
 
@@ -617,7 +617,7 @@ function App() {
       });
     }
     await putFiles(payload);
-    await setNoticeAndRefresh(`邨先棡CSV蜿冶ｾｼ: ${payload.length} 莉ｶ`);
+    await setNoticeAndRefresh(`結果CSV取込: ${payload.length} 件`);
   }
 
   async function handleExportResultCsv(result: ResponseResult | null): Promise<void> {
@@ -636,7 +636,7 @@ function App() {
       return;
     }
     const count = await importWorkspaceZip(filesToUpload[0]);
-    await setNoticeAndRefresh(`ZIP蜿冶ｾｼ螳御ｺ・ ${count} 繝輔ぃ繧､繝ｫ`);
+    await setNoticeAndRefresh(`ZIP取込完了・ ${count} ファイル`);
   }
 
   async function handleResetWorkspace(): Promise<void> {
@@ -665,9 +665,9 @@ function App() {
             <th>Select</th>
             <th>Name</th>
             <th>Index</th>
-            <th>莉ｻ諢乗ｸ幄｡ｰ</th>
+            <th>任意減衰</th>
             <th>h</th>
-            <th>讓呎ｺ匁ｸ幄｡ｰ</th>
+            <th>減衰定数</th>
           </tr>
         </thead>
         <tbody>
@@ -775,9 +775,9 @@ function App() {
     const x = result.time;
     const top = Math.max(0, result.mainMassCount - 1);
     const acc = [
-      { name: "蜈･蜉帶ｳ｢", x, y: result.waveAcc, color: "#2b59c3" },
+      { name: "入力波", x, y: result.waveAcc, color: "#2b59c3" },
       {
-        name: `荳ｻ譫ｶ讒帰_${top + 2}F`,
+        name: `主系絶_${top + 2}F`,
         x,
         y: result.mainAcc[top] ?? [],
         color: "#d1495b",
@@ -785,7 +785,7 @@ function App() {
     ];
     const dis = [
       {
-        name: `荳ｻ譫ｶ讒汽_${top + 2}F`,
+        name: `主系相_${top + 2}F`,
         x,
         y: result.mainDis[top] ?? [],
         color: "#00798c",
@@ -809,7 +809,7 @@ function App() {
   }
 
   if (!ready) {
-    return <div className="loading">蛻晄悄蛹紋ｸｭ...</div>;
+    return <div className="loading">初期化紋ｸｭ...</div>;
   }
 
   const baseSeries = resultSeriesForPlot(baseActiveResult);
@@ -852,7 +852,7 @@ function App() {
           <div className="notice">{notice || "Ready"}</div>
           <div className="actions">
             <label className="file-btn">
-              ZIP蜿冶ｾｼ
+              ZIP取込
               <input
                 type="file"
                 accept=".zip"
@@ -863,15 +863,15 @@ function App() {
               />
             </label>
             <button onClick={() => void exportWorkspaceZip("tmd-workspace.zip")}>
-              ZIP蜃ｺ蜉・            </button>
+              ZIP出力・            </button>
             <button className="danger" onClick={() => void handleResetWorkspace()}>
-              蛻晄悄蛹・            </button>
+              初期化・            </button>
           </div>
         </header>
 
         {activeMenu === "model" && (
           <section className="panel">
-            <h2>繝｢繝・Ν菴懈・繝ｻ菫ｮ豁｣</h2>
+            <h2>モデル作成・修正</h2>
             <div className="row">
               <select
                 value={selectedModelPath}
@@ -892,7 +892,7 @@ function App() {
                 }}
                 disabled={!selectedModelPath}
               >
-                隱ｭ霎ｼ
+                読込
               </button>
               <button
                 onClick={() => {
@@ -900,13 +900,13 @@ function App() {
                   setSelectedModelPath("");
                 }}
               >
-                譁ｰ隕・              </button>
+                新規・              </button>
               <button onClick={() => void handleSaveModel()}>Save</button>
             </div>
             <div className="grid-two">
               <div>
                 <label>
-                  繝｢繝・Ν蜷・                  <input
+                  モデル名・                  <input
                     value={modelDraft.name}
                     onChange={(event) =>
                       setModelDraft((prev) => ({ ...prev, name: event.target.value }))
@@ -914,7 +914,7 @@ function App() {
                   />
                 </label>
                 <label>
-                  雉ｪ轤ｹ謨ｰ
+                  階数
                   <input
                     type="number"
                     min={1}
@@ -929,9 +929,9 @@ function App() {
                   <thead>
                     <tr>
                       <th>Floor</th>
-                      <th>驥埼㍼[kN]</th>
+                      <th>重量[kN]</th>
                       <th>蜑帶ｧ[kN/cm]</th>
-                      <th>莉伜刈貂幄｡ｰ[kN/kine]</th>
+                      <th>付加減衰[kN/kine]</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -996,7 +996,7 @@ function App() {
                       }))
                     }
                   >
-                    陦瑚ｿｽ蜉
+                    行追加
                   </button>
                   <button
                     onClick={() =>
@@ -1006,15 +1006,15 @@ function App() {
                       }))
                     }
                   >
-                    繧ｯ繝ｪ繧｢
+                    クリア
                   </button>
                 </div>
                 <table className="data-table">
                   <thead>
                     <tr>
                       <th>Floor</th>
-                      <th>驥埼㍼[kN]</th>
-                      <th>謖ｯ蜍墓焚[Hz]</th>
+                      <th>重量[kN]</th>
+                      <th>振動数[Hz]</th>
                       <th />
                     </tr>
                   </thead>
@@ -1091,7 +1091,7 @@ function App() {
                               }))
                             }
                           >
-                            蜑企勁
+                            削除
                           </button>
                         </td>
                       </tr>
@@ -1125,8 +1125,8 @@ function App() {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>谺｡謨ｰ</th>
-                    <th>謖ｯ蜍墓焚[Hz]</th>
+                    <th>次数</th>
+                    <th>振動数[Hz]</th>
                     <th>Effective Mass Ratio</th>
                     <th>蛻ｺ豼菫よ焚</th>
                   </tr>
@@ -1152,7 +1152,7 @@ function App() {
             <div className="grid-two">
               <div>
                 <label>
-                  謖ｯ蜍墓焚[Hz]
+                  振動数[Hz]
                   <input
                     type="number"
                     min={0.01}
@@ -1167,7 +1167,7 @@ function App() {
                   />
                 </label>
                 <label>
-                  貍ｸ蠅怜屓謨ｰ
+                  漸増回数
                   <input
                     type="number"
                     min={0}
@@ -1181,7 +1181,7 @@ function App() {
                   />
                 </label>
                 <label>
-                  螳壼ｸｸ蝗樊焚
+                  定常回数
                   <input
                     type="number"
                     min={1}
@@ -1195,7 +1195,7 @@ function App() {
                   />
                 </label>
                 <label>
-                  貍ｸ貂帛屓謨ｰ
+                  漸減回数
                   <input
                     type="number"
                     min={0}
@@ -1219,10 +1219,10 @@ function App() {
                       }))
                     }
                   />
-                  蜉謖ｯ蠕・遘偵・隕ｳ貂ｬ繧定ｿｽ蜉
+                  蜉謖ｯ蠕・遘偵・隕ｳ貂ｬを定保ｽ蜉
                 </label>
                 <div className="row">
-                  <button onClick={handleGenerateSine}>豕｢蠖｢逕滓・</button>
+                  <button onClick={handleGenerateSine}>波形生成</button>
                   <input
                     value={sineFileName}
                     onChange={(event) => setSineFileName(event.target.value)}
@@ -1232,7 +1232,7 @@ function App() {
               </div>
               <div>
                 <LineChart
-                  title="豁｣蠑ｦ豕｢"
+                  title="正弦波"
                   xLabel="Time [s]"
                   yLabel="Amplitude"
                   series={[
@@ -1284,7 +1284,7 @@ function App() {
                   </option>
                 ))}
               </select>
-              <button onClick={handleLoadExistingWaveAnalysis}>譌｢蟄倡ｵ先棡隱ｭ霎ｼ</button>
+              <button onClick={handleLoadExistingWaveAnalysis}>既存結果読込</button>
             </div>
             {waveAnalysisResult && (
               <>
@@ -1292,7 +1292,7 @@ function App() {
                   <div>Amax: {waveAnalysisResult.amax.toFixed(3)} gal</div>
                   <div>Vmax: {waveAnalysisResult.vmax.toFixed(3)} kine</div>
                   <div>Dmax: {waveAnalysisResult.dmax.toFixed(3)} cm</div>
-                  <div>邯咏ｶ壽凾髢・ {(waveAnalysisResult.time.length * 0.01).toFixed(2)} s</div>
+                  <div>継続時間・ {(waveAnalysisResult.time.length * 0.01).toFixed(2)} s</div>
                 </div>
                 <div className="grid-two">
                   <LineChart
@@ -1353,7 +1353,7 @@ function App() {
               </>
             )}
             <p className="note">
-              隗｣譫先凾縺ｫ `WaveAnalysis/avd` 縺ｨ `WaveAnalysis/spectrum` 縺ｸCSV繧剃ｿ晏ｭ倥＠縺ｾ縺吶・            </p>
+              解析時に `WaveAnalysis/avd` すｨ `WaveAnalysis/spectrum` へCSVを保存します吶・            </p>
           </section>
         )}
 
@@ -1388,7 +1388,7 @@ function App() {
                   checked={showTmdTrace}
                   onChange={(event) => setShowTmdTrace(event.target.checked)}
                 />
-                TMD繧呈緒逕ｻ
+                TMDを描画
               </label>
               <select
                 value={baseActiveResultName}
@@ -1402,13 +1402,13 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(baseActiveResult)}>
-                驕ｸ謚樒ｵ先棡繧偵ム繧ｦ繝ｳ繝ｭ繝ｼ繝・              </button>
+                選択結果をダウンロード・              </button>
             </div>
             {baseResults.length > 0 && (
               <table className="data-table compact">
                 <thead>
                   <tr>
-                    <th>隗｣譫仙錐</th>
+                    <th>解析名</th>
                     <th>Main Amax</th>
                     <th>Main Dmax</th>
                     <th>TMD Amax</th>
@@ -1433,7 +1433,7 @@ function App() {
             )}
             <div className="grid-two">
               <LineChart
-                title="蠢懃ｭ泌刈騾溷ｺｦ"
+                title="絶対加速度"
                 xLabel="Time [s]"
                 yLabel="gal"
                 series={baseSeries.acc}
@@ -1452,7 +1452,7 @@ function App() {
           <section className="panel">
             <h2>Response View (Reload CSV)</h2>
             <div className="row">
-              <button onClick={handleLoadViewResults}>驕ｸ謚曚SV繧定｡ｨ遉ｺ</button>
+              <button onClick={handleLoadViewResults}>選択CSVを表示</button>
               <select
                 value={viewActiveResultName}
                 onChange={(event) => setViewActiveResultName(event.target.value)}
@@ -1465,9 +1465,9 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(viewActiveResult)}>
-                驕ｸ謚樒ｵ先棡繧偵ム繧ｦ繝ｳ繝ｭ繝ｼ繝・              </button>
+                選択結果をダウンロード・              </button>
               <label className="file-btn">
-                CSV霑ｽ蜉
+                CSV追加
                 <input
                   type="file"
                   accept=".csv"
@@ -1482,8 +1482,8 @@ function App() {
             <table className="data-table compact">
               <thead>
                 <tr>
-                  <th>陦ｨ遉ｺ</th>
-                  <th>CSV繝代せ</th>
+                  <th>表示</th>
+                  <th>CSVパス</th>
                 </tr>
               </thead>
               <tbody>
@@ -1525,7 +1525,7 @@ function App() {
               <input
                 value={forceName}
                 onChange={(event) => setForceName(event.target.value)}
-                placeholder="蠑ｷ蛻ｶ蜉帛錐"
+                placeholder="強制力名"
               />
               <button
                 onClick={() =>
@@ -1540,7 +1540,7 @@ function App() {
                   ])
                 }
               >
-                蠑ｷ蛻ｶ蜉幄ｿｽ蜉
+                強制力追加
               </button>
               <button onClick={() => void handleRunForceResponse()}>Run Response</button>
               <button onClick={() => void saveResponseResults(forceResults, baseViewGroupName)}>
@@ -1549,7 +1549,7 @@ function App() {
             <table className="data-table compact">
               <thead>
                 <tr>
-                  <th>蜊倅ｽ肴ｳ｢</th>
+                  <th>作用波</th>
                   <th>Floor</th>
                   <th>譛螟ｧ蠑ｷ蛻ｶ蜉媼kN]</th>
                   <th />
@@ -1628,7 +1628,7 @@ function App() {
                           )
                         }
                       >
-                        蜑企勁
+                        削除
                       </button>
                     </td>
                   </tr>
@@ -1649,11 +1649,11 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(forceActiveResult)}>
-                驕ｸ謚樒ｵ先棡繧偵ム繧ｦ繝ｳ繝ｭ繝ｼ繝・              </button>
+                選択結果をダウンロード・              </button>
             </div>
             <div className="grid-two">
               <LineChart
-                title="蠑ｷ蛻ｶ蜉・蠢懃ｭ泌刈騾溷ｺｦ"
+                title="強制力・絶対加速度"
                 xLabel="Time [s]"
                 yLabel="gal"
                 series={forceSeries.acc}
@@ -1669,8 +1669,8 @@ function App() {
         )}
 
         <footer className="footer-note">
-          C#迚井ｺ呈鋤莉墓ｧ・ Newmark-ﾎｲ (ﾎｳ=0.5, ﾎｲ=0.25, dt=0.01), g=9.80665,
-          dat/csv莠呈鋤, Shift_JIS蜈･蜉帛ｯｾ蠢・        </footer>
+          C#元数値仕様・ Newmark-ﾎｲ (ﾎｳ=0.5, ﾎｲ=0.25, dt=0.01), g=9.80665,
+          dat/csv莠呈鋤, Shift_JIS入力対応・        </footer>
       </main>
     </div>
   );
