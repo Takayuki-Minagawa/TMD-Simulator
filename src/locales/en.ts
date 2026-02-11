@@ -4,7 +4,7 @@ export const en: Translations = {
   app: {
     title: 'TMD-Simulator Web',
     subtitle: 'TMD Response Analysis Tool',
-    version: 'Ver.Beta01',
+    version: 'Ver.1.00',
     loading: 'Initializing...',
   },
 
@@ -210,11 +210,13 @@ export const en: Translations = {
     dataIO: {
       title: 'Data Import/Export',
       content: `
-        <h4>Workspace Backup</h4>
-        <p>Click "Export ZIP" button at the top right to download all model data, input waves, and analysis results as a ZIP file.</p>
-
-        <h4>Data Restoration</h4>
-        <p>Use "Import ZIP" button to import previously exported ZIP files.</p>
+        <h4>How to Add Data</h4>
+        <p>Use ZIP import/export to add input waves and models:</p>
+        <ol>
+          <li>Click "<strong>Export ZIP</strong>" to download a folder structure template</li>
+          <li>Extract the ZIP and add files to the appropriate folders</li>
+          <li>Re-compress to ZIP and use "<strong>Import ZIP</strong>" to load</li>
+        </ol>
 
         <h4>CSV File Format</h4>
         <ul>
@@ -223,6 +225,10 @@ export const en: Translations = {
           <li><strong>Force Wave</strong>: <code>ForceWave/*.csv</code></li>
           <li><strong>Analysis Result</strong>: <code>Result/his/*_res.csv</code></li>
         </ul>
+
+        <h4>Workspace Backup</h4>
+        <p>Click "Export ZIP" to download all data as a ZIP file. Regular backups are recommended.</p>
+        <p>All data is stored in the browser's IndexedDB. Data will be lost if browser data is cleared, so please back up via Export ZIP.</p>
 
         <h4>Numerical Specifications</h4>
         <ul>

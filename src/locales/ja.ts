@@ -4,7 +4,7 @@ export const ja: Translations = {
   app: {
     title: 'TMD-Simulator Web',
     subtitle: 'TMD応答解析ツール',
-    version: 'Ver.Beta01',
+    version: 'Ver.1.00',
     loading: '初期化中...',
   },
 
@@ -210,11 +210,13 @@ export const ja: Translations = {
     dataIO: {
       title: 'データの入出力',
       content: `
-        <h4>ワークスペースのバックアップ</h4>
-        <p>右上の「ZIP出力」ボタンで、全てのモデルデータ、入力波、解析結果をZIPファイルとしてダウンロードできます。</p>
-
-        <h4>データの復元</h4>
-        <p>「ZIP取込」ボタンで、以前にエクスポートしたZIPファイルをインポートできます。</p>
+        <h4>データの追加方法</h4>
+        <p>入力波やモデルを追加するにはZIP入出力を使用します：</p>
+        <ol>
+          <li>「<strong>ZIP出力</strong>」でフォルダ構成テンプレートをダウンロード</li>
+          <li>ZIPを展開し、対応フォルダにファイルを追加</li>
+          <li>ZIPに再圧縮し「<strong>ZIP取込</strong>」で読込み</li>
+        </ol>
 
         <h4>CSVファイル形式</h4>
         <ul>
@@ -223,6 +225,10 @@ export const ja: Translations = {
           <li><strong>強制力波</strong>: <code>ForceWave/*.csv</code></li>
           <li><strong>解析結果</strong>: <code>Result/his/*_res.csv</code></li>
         </ul>
+
+        <h4>ワークスペースのバックアップ</h4>
+        <p>「ZIP出力」で全てのデータをZIPファイルとしてダウンロードできます。定期的なバックアップを推奨します。</p>
+        <p>全データはブラウザのIndexedDBに保存されています。ブラウザのデータ消去でデータが失われるため、ZIP出力でバックアップしてください。</p>
 
         <h4>数値計算仕様</h4>
         <ul>
