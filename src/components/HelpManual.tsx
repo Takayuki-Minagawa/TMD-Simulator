@@ -1,4 +1,4 @@
-import { Translations } from '../types/translations';
+import type { Translations } from '../types/translations';
 
 interface HelpManualProps {
   isOpen: boolean;

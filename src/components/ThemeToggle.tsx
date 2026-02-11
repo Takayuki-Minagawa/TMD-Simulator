@@ -1,4 +1,4 @@
-import { Theme } from '../utils/localStorage';
+import type { Theme } from '../utils/localStorage';
 
 interface ThemeToggleProps {
   theme: Theme;

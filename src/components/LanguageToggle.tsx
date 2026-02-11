@@ -1,4 +1,4 @@
-import { Language } from '../locales';
+import type { Language } from '../locales';
 
 interface LanguageToggleProps {
   language: Language;

@@ -48,7 +48,7 @@ import {
 import { exportWorkspaceZip, importWorkspaceZip } from "@/storage/workspaceZip.ts";
 import { useTheme } from "@/hooks/useTheme";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Language } from "@/locales";
+import type { Language } from "@/locales";
 import { storage } from "@/utils/localStorage";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";

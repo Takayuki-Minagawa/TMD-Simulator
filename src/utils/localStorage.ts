@@ -1,4 +1,4 @@
-import { Language } from '../locales';
+import type { Language } from '../locales';
 
 const THEME_KEY = 'tmd-simulator-theme';
 const LANGUAGE_KEY = 'tmd-simulator-language';
