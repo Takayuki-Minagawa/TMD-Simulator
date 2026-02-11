@@ -370,9 +370,9 @@ function App() {
       const mi = model.weightsKn.map((value) => value / GRAVITY);
       const ki = model.stiffnessKnPerCm.map((value) => value * 100);
       setEigenResult(eigenWork(mi, ki));
-      setNotice(`蝗ｺ譛牙､解析怜ｮ了・ ${model.name}`);
+      setNotice(`固有値解析完了・ ${model.name}`);
     } catch (error) {
-      setNotice(`蝗ｺ譛牙､解析励おラー: ${(error as Error).message}`);
+      setNotice(`固有値解析エラー: ${(error as Error).message}`);
     }
   }
 
@@ -793,7 +793,7 @@ function App() {
     ];
     if (showTmdTrace && result.tmdCount > 0) {
       acc.push({
-        name: "TMD蜉騾溷ｺｦ",
+        name: "TMD加速度",
         x,
         y: result.tmdAcc[0] ?? [],
         color: "#f18f01",
@@ -930,7 +930,7 @@ function App() {
                     <tr>
                       <th>Floor</th>
                       <th>重量[kN]</th>
-                      <th>蜑帶ｧ[kN/cm]</th>
+                      <th>剛性[kN/cm]</th>
                       <th>付加減衰[kN/kine]</th>
                     </tr>
                   </thead>
@@ -984,7 +984,7 @@ function App() {
               </div>
               <div>
                 <div className="row">
-                  <h3>TMD諠・ｱ</h3>
+                  <h3>TMD情報</h3>
                   <button
                     onClick={() =>
                       setModelDraft((prev) => ({
@@ -996,7 +996,7 @@ function App() {
                       }))
                     }
                   >
-                    行追加
+                    行追加
                   </button>
                   <button
                     onClick={() =>
@@ -1128,7 +1128,7 @@ function App() {
                     <th>次数</th>
                     <th>振動数[Hz]</th>
                     <th>Effective Mass Ratio</th>
-                    <th>蛻ｺ豼菫よ焚</th>
+                    <th>刺激係数</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1219,7 +1219,8 @@ function App() {
                       }))
                     }
                   />
-                  蜉謖ｯ蠕・遘偵・隕ｳ貂ｬを定保ｽ蜉
+                  加振後の残り観測を追加
+
                 </label>
                 <div className="row">
                   <button onClick={handleGenerateSine}>波形生成</button>
@@ -1353,7 +1354,7 @@ function App() {
               </>
             )}
             <p className="note">
-              解析時に `WaveAnalysis/avd` すｨ `WaveAnalysis/spectrum` へCSVを保存します吶・            </p>
+              解析時に `WaveAnalysis/avd` と `WaveAnalysis/spectrum` へCSVを保存します・            </p>
           </section>
         )}
 
@@ -1467,7 +1468,7 @@ function App() {
               <button onClick={() => void handleExportResultCsv(viewActiveResult)}>
                 選択結果をダウンロード・              </button>
               <label className="file-btn">
-                CSV追加
+                CSV追加
                 <input
                   type="file"
                   accept=".csv"
@@ -1503,7 +1504,7 @@ function App() {
             </table>
             <div className="grid-two">
               <LineChart
-                title="蜀崎ｪｭ霎ｼ 蜉騾溷ｺｦ"
+                title="再読込 加速度"
                 xLabel="Time [s]"
                 yLabel="gal"
                 series={viewSeries.acc}
@@ -1540,7 +1541,7 @@ function App() {
                   ])
                 }
               >
-                強制力追加
+                強制力追加
               </button>
               <button onClick={() => void handleRunForceResponse()}>Run Response</button>
               <button onClick={() => void saveResponseResults(forceResults, baseViewGroupName)}>
@@ -1551,7 +1552,7 @@ function App() {
                 <tr>
                   <th>作用波</th>
                   <th>Floor</th>
-                  <th>譛螟ｧ蠑ｷ蛻ｶ蜉媼kN]</th>
+                  <th>最大強制力[kN]</th>
                   <th />
                 </tr>
               </thead>
