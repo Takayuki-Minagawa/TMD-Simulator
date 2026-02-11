@@ -46,6 +46,14 @@ import {
   requiredFolders,
 } from "@/storage/workspaceDb.ts";
 import { exportWorkspaceZip, importWorkspaceZip } from "@/storage/workspaceZip.ts";
+import { useTheme } from "@/hooks/useTheme";
+import { useTranslation } from "@/hooks/useTranslation";
+import { Language } from "@/locales";
+import { storage } from "@/utils/localStorage";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { HelpManual } from "@/components/HelpManual";
+import { Favicon } from "@/components/Favicon";
 
 type MenuKey =
   | "model"
@@ -69,15 +77,8 @@ interface ForceRow {
 
 type SelectionUpdater = (updater: (prev: ModelSelection[]) => ModelSelection[]) => void;
 
-const MENU_ITEMS: { key: MenuKey; label: string }[] = [
-  { key: "model", label: "1. Model Edit" },
-  { key: "eigen", label: "2. Eigen Mode" },
-  { key: "sine", label: "3. Sine Wave" },
-  { key: "wave", label: "4. Wave Analysis" },
-  { key: "base", label: "5. Base Response" },
-  { key: "view", label: "6. Result View" },
-  { key: "force", label: "7. Force Response" },
-];
+// Menu keys for type safety
+const MENU_KEYS = ["model", "eigen", "sine", "wave", "base", "view", "force"] as const;
 
 function normalizeModelSelection(
   previous: ModelSelection[],
@@ -172,6 +173,21 @@ function App() {
   const [viewChecks, setViewChecks] = useState<Record<string, boolean>>({});
   const [viewResults, setViewResults] = useState<ResponseResult[]>([]);
   const [viewActiveResultName, setViewActiveResultName] = useState("");
+
+  // Theme and language state
+  const { theme, toggleTheme } = useTheme();
+  const [language, setLanguage] = useState<Language>(() => storage.getLanguage() || 'ja');
+  const [showHelp, setShowHelp] = useState(false);
+  const t = useTranslation(language);
+
+  // Persist language preference
+  useEffect(() => {
+    storage.setLanguage(language);
+  }, [language]);
+
+  const toggleLanguage = () => {
+    setLanguage((prev) => (prev === 'ja' ? 'en' : 'ja'));
+  };
 
   const fileMap = useMemo(
     () => new Map(files.map((item) => [item.path, item])),
@@ -342,9 +358,9 @@ function App() {
       const parsed = parseModelDat(getContent(path), modelNameFromPath(path));
       setModelDraft(parsed);
       setSelectedModelPath(path);
-      setNotice(`モデル読込: ${path}`);
+      setNotice(t.messages.modelLoaded);
     } catch (error) {
-      setNotice(`モデル読込エラー: ${(error as Error).message}`);
+      setNotice(`${t.messages.modelLoadError}: ${(error as Error).message}`);
     }
   }
 
@@ -356,13 +372,13 @@ function App() {
       storyCount: Math.min(9, Math.max(1, modelDraft.storyCount)),
     };
     await putFile(`model/${name}.dat`, serializeModelDat(normalized));
-    await setNoticeAndRefresh(`モデル保存・ model/${name}.dat`);
+    await setNoticeAndRefresh(t.messages.modelSaved);
     setSelectedModelPath(`model/${name}.dat`);
   }
 
   function handleComputeEigen(): void {
     if (!eigenModelPath) {
-      setNotice("Select a model for eigen analysis.");
+      setNotice(t.messages.selectModel);
       return;
     }
     try {
@@ -370,9 +386,9 @@ function App() {
       const mi = model.weightsKn.map((value) => value / GRAVITY);
       const ki = model.stiffnessKnPerCm.map((value) => value * 100);
       setEigenResult(eigenWork(mi, ki));
-      setNotice(`固有値解析完了・ ${model.name}`);
+      setNotice(t.messages.eigenComplete);
     } catch (error) {
-      setNotice(`固有値解析エラー: ${(error as Error).message}`);
+      setNotice(`${t.messages.eigenError}: ${(error as Error).message}`);
     }
   }
 
@@ -381,17 +397,17 @@ function App() {
     const existing = forceWaveFiles.map((file) => fileNameFromPath(file.path));
     setSineWave(generated);
     setSineFileName(createSineWaveFileName(sineInput.freqHz, existing));
-    setNotice(`Sine wave generated: ${generated.length} samples`);
+    setNotice(t.messages.sineWaveGenerated);
   }
 
   async function handleSaveSine(): Promise<void> {
     if (sineWave.length === 0) {
-      setNotice("Generate a sine wave before saving.");
+      setNotice(t.messages.generateSineFirst);
       return;
     }
     const safeName = sineFileName.trim() || "Freq0300_001.csv";
     await putFile(`ForceWave/${safeName}`, serializeWaveCsv(sineWave));
-    await setNoticeAndRefresh(`保存完了・ ForceWave/${safeName}`);
+    await setNoticeAndRefresh(t.messages.saveSineComplete);
   }
 
   function analysisPathFromWave(wavePath: string): { avd: string; spectrum: string } {
@@ -405,7 +421,7 @@ function App() {
   async function handleAnalyzeWave(): Promise<void> {
     const targetWavePath = effectiveWaveTargetPath;
     if (!targetWavePath) {
-      setNotice("Select an input wave.");
+      setNotice(t.messages.selectWave);
       return;
     }
     try {
@@ -422,17 +438,17 @@ function App() {
           ),
         },
       ]);
-      await setNoticeAndRefresh(`入力波解析完了・ ${toStem(targetWavePath)}`);
+      await setNoticeAndRefresh(t.messages.waveAnalysisComplete);
       setWaveAnalysisResult(result);
       setExistingAvdPath(paths.avd);
     } catch (error) {
-      setNotice(`入力波解析エラー: ${(error as Error).message}`);
+      setNotice(`${t.messages.waveAnalysisError}: ${(error as Error).message}`);
     }
   }
 
   function handleLoadExistingWaveAnalysis(): void {
     if (!existingAvdPath) {
-      setNotice("Select an existing AVD file.");
+      setNotice(t.messages.selectWave);
       return;
     }
     try {
@@ -458,9 +474,9 @@ function App() {
         vmax: maxAbs(avd.vel),
         dmax: maxAbs(avd.dis),
       });
-      setNotice(`既存解析結果を読込: ${existingAvdPath}`);
+      setNotice(t.messages.existingResultLoaded);
     } catch (error) {
-      setNotice(`分析結果読込エラー: ${(error as Error).message}`);
+      setNotice(`${t.messages.analysisResultLoadError}: ${(error as Error).message}`);
     }
   }
 
@@ -488,7 +504,7 @@ function App() {
   async function handleRunBaseResponse(): Promise<void> {
     const targetWavePath = effectiveBaseWavePath;
     if (!targetWavePath) {
-      setNotice("Select a base input wave.");
+      setNotice(t.messages.selectWave);
       return;
     }
     try {
@@ -500,9 +516,9 @@ function App() {
       });
       setBaseResults(results);
       setBaseActiveResultName(results[0]?.name ?? "");
-      setNotice(`基礎入力応答解析完了・ ${results.length} ケース`);
+      setNotice(`${t.messages.baseResponseComplete}: ${results.length} ${t.messages.cases}`);
     } catch (error) {
-      setNotice(`基礎入力応答解析エラー: ${(error as Error).message}`);
+      setNotice(`${t.messages.baseResponseError}: ${(error as Error).message}`);
     }
   }
 
@@ -511,7 +527,7 @@ function App() {
     groupName: string,
   ): Promise<void> {
     if (results.length === 0) {
-      setNotice("No response results to save.");
+      setNotice(t.messages.noResultsToSave);
       return;
     }
     const normalizedGroup = groupName.trim();
@@ -530,7 +546,7 @@ function App() {
       }
     }
     await putFiles(payload);
-    await setNoticeAndRefresh(`結果CSV出力完了・ ${results.length} 件`);
+    await setNoticeAndRefresh(`${t.messages.resultCsvSaved}: ${results.length} ${t.messages.files}`);
   }
 
   async function handleRunForceResponse(): Promise<void> {
@@ -539,7 +555,7 @@ function App() {
         (row) => row.wavePath && Number.isFinite(row.maxForceKn),
       );
       if (configuredRows.length === 0) {
-        setNotice("Configure force input rows.");
+        setNotice(t.messages.configureForceRows);
         return;
       }
 
@@ -553,7 +569,7 @@ function App() {
         Number.POSITIVE_INFINITY,
       );
       if (!Number.isFinite(minLength) || minLength <= 0) {
-        setNotice("Force wave data length is invalid.");
+        setNotice(t.messages.selectWave);
         return;
       }
       const forceSeries = loaded.map((item) => ({
@@ -574,9 +590,9 @@ function App() {
       );
       setForceResults(results);
       setForceActiveResultName(results[0]?.name ?? "");
-      setNotice(`強制力応答解析完了・ ${results.length} ケース`);
+      setNotice(`${t.messages.forceResponseComplete}: ${results.length} ${t.messages.cases}`);
     } catch (error) {
-      setNotice(`強制力応答解析エラー: ${(error as Error).message}`);
+      setNotice(`${t.messages.forceResponseError}: ${(error as Error).message}`);
     }
   }
 
@@ -589,7 +605,7 @@ function App() {
       .filter(([, checked]) => checked)
       .map(([path]) => path);
     if (selectedPaths.length === 0) {
-      setNotice("Select at least one CSV file to view.");
+      setNotice(t.messages.selectAtLeastOneCsv);
       return;
     }
     try {
@@ -598,9 +614,9 @@ function App() {
       );
       setViewResults(loaded);
       setViewActiveResultName(loaded[0]?.name ?? "");
-      setNotice(`蜀崎ｪｭ霎ｼ表示: ${loaded.length} 件`);
+      setNotice(`${t.messages.reloadDisplayComplete}: ${loaded.length} ${t.messages.files}`);
     } catch (error) {
-      setNotice(`再読込エラー: ${(error as Error).message}`);
+      setNotice(`${t.messages.reloadError}: ${(error as Error).message}`);
     }
   }
 
@@ -617,12 +633,12 @@ function App() {
       });
     }
     await putFiles(payload);
-    await setNoticeAndRefresh(`結果CSV取込: ${payload.length} 件`);
+    await setNoticeAndRefresh(`${t.messages.resultCsvImported}: ${payload.length} ${t.messages.files}`);
   }
 
   async function handleExportResultCsv(result: ResponseResult | null): Promise<void> {
     if (!result) {
-      setNotice("Select a result to export.");
+      setNotice(t.messages.selectResultToExport);
       return;
     }
     const blob = new Blob([serializeResponseCsv(result)], {
@@ -636,19 +652,17 @@ function App() {
       return;
     }
     const count = await importWorkspaceZip(filesToUpload[0]);
-    await setNoticeAndRefresh(`ZIP取込完了・ ${count} ファイル`);
+    await setNoticeAndRefresh(`${t.messages.zipImportComplete}: ${count} ${t.messages.files}`);
   }
 
   async function handleResetWorkspace(): Promise<void> {
-    const accepted = window.confirm(
-      "Reset workspace data in IndexedDB? This action cannot be undone.",
-    );
+    const accepted = window.confirm(t.messages.resetConfirm);
     if (!accepted) {
       return;
     }
     await clearWorkspace();
     await initializeWorkspace();
-    await setNoticeAndRefresh("Workspace has been reset.");
+    await setNoticeAndRefresh(t.messages.workspaceReset);
     setBaseResults([]);
     setForceResults([]);
     setViewResults([]);
@@ -662,12 +676,12 @@ function App() {
       <table className="data-table compact">
         <thead>
           <tr>
-            <th>Select</th>
-            <th>Name</th>
-            <th>Index</th>
-            <th>任意減衰</th>
-            <th>h</th>
-            <th>減衰定数</th>
+            <th>{t.table.select}</th>
+            <th>{t.table.name}</th>
+            <th>{t.table.index}</th>
+            <th>{t.table.userDamping}</th>
+            <th>{t.table.dampingH}</th>
+            <th>{t.table.dampingConstant}</th>
           </tr>
         </thead>
         <tbody>
@@ -809,8 +823,19 @@ function App() {
   }
 
   if (!ready) {
-    return <div className="loading">初期化紋ｸｭ...</div>;
+    return <div className="loading">{t.app.loading}</div>;
   }
+
+  // Create menu items with translations
+  const menuItems: { key: MenuKey; label: string }[] = [
+    { key: "model", label: t.menu.modelEdit },
+    { key: "eigen", label: t.menu.eigenMode },
+    { key: "sine", label: t.menu.sineWave },
+    { key: "wave", label: t.menu.waveAnalysis },
+    { key: "base", label: t.menu.baseResponse },
+    { key: "view", label: t.menu.resultView },
+    { key: "force", label: t.menu.forceResponse },
+  ];
 
   const baseSeries = resultSeriesForPlot(baseActiveResult);
   const forceSeries = resultSeriesForPlot(forceActiveResult);
@@ -820,11 +845,11 @@ function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <h1>TMD-Simulator Web</h1>
-          <p>GitHub Pages Static SPA</p>
+          <h1>{t.app.title}</h1>
+          <p>{t.app.subtitle}</p>
         </div>
         <nav className="menu">
-          {MENU_ITEMS.map((item) => (
+          {menuItems.map((item) => (
             <button
               key={item.key}
               className={activeMenu === item.key ? "menu-item active" : "menu-item"}
@@ -835,7 +860,7 @@ function App() {
           ))}
         </nav>
         <div className="folder-status">
-          <h3>Workspace Folders</h3>
+          <h3>{t.folders.title}</h3>
           <ul>
             {requiredFolders().map((folder) => (
               <li key={folder}>
@@ -849,10 +874,13 @@ function App() {
 
       <main className="main">
         <header className="topbar">
-          <div className="notice">{notice || "Ready"}</div>
+          <div className="notice">{notice || t.topbar.ready}</div>
           <div className="actions">
+            <button onClick={() => setShowHelp(true)}>
+              {t.topbar.help}
+            </button>
             <label className="file-btn">
-              ZIP取込
+              {t.topbar.zipImport}
               <input
                 type="file"
                 accept=".zip"
@@ -863,21 +891,25 @@ function App() {
               />
             </label>
             <button onClick={() => void exportWorkspaceZip("tmd-workspace.zip")}>
-              ZIP出力・            </button>
+              {t.topbar.zipExport}
+            </button>
             <button className="danger" onClick={() => void handleResetWorkspace()}>
-              初期化・            </button>
+              {t.topbar.reset}
+            </button>
+            <LanguageToggle language={language} onToggle={toggleLanguage} />
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
           </div>
         </header>
 
         {activeMenu === "model" && (
           <section className="panel">
-            <h2>モデル作成・修正</h2>
+            <h2>{t.modelEdit.title}</h2>
             <div className="row">
               <select
                 value={selectedModelPath}
                 onChange={(event) => setSelectedModelPath(event.target.value)}
               >
-                <option value="">Select model</option>
+                <option value="">{t.modelEdit.selectModel}</option>
                 {modelFiles.map((file) => (
                   <option key={file.path} value={file.path}>
                     {fileNameFromPath(file.path)}
@@ -892,7 +924,7 @@ function App() {
                 }}
                 disabled={!selectedModelPath}
               >
-                読込
+                {t.modelEdit.load}
               </button>
               <button
                 onClick={() => {
@@ -900,13 +932,15 @@ function App() {
                   setSelectedModelPath("");
                 }}
               >
-                新規・              </button>
-              <button onClick={() => void handleSaveModel()}>Save</button>
+                {t.modelEdit.new}
+              </button>
+              <button onClick={() => void handleSaveModel()}>{t.modelEdit.save}</button>
             </div>
             <div className="grid-two">
               <div>
                 <label>
-                  モデル名・                  <input
+                  {t.modelEdit.modelName}
+                  <input
                     value={modelDraft.name}
                     onChange={(event) =>
                       setModelDraft((prev) => ({ ...prev, name: event.target.value }))
@@ -914,7 +948,7 @@ function App() {
                   />
                 </label>
                 <label>
-                  階数
+                  {t.modelEdit.storyCount}
                   <input
                     type="number"
                     min={1}
@@ -928,10 +962,10 @@ function App() {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Floor</th>
-                      <th>重量[kN]</th>
-                      <th>剛性[kN/cm]</th>
-                      <th>付加減衰[kN/kine]</th>
+                      <th>{t.modelEdit.floor}</th>
+                      <th>{t.modelEdit.weight}</th>
+                      <th>{t.modelEdit.stiffness}</th>
+                      <th>{t.modelEdit.damping}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -984,7 +1018,7 @@ function App() {
               </div>
               <div>
                 <div className="row">
-                  <h3>TMD情報</h3>
+                  <h3>{t.modelEdit.tmdInfo}</h3>
                   <button
                     onClick={() =>
                       setModelDraft((prev) => ({
@@ -996,7 +1030,7 @@ function App() {
                       }))
                     }
                   >
-                    行追加
+                    {t.modelEdit.addRow}
                   </button>
                   <button
                     onClick={() =>
@@ -1006,15 +1040,15 @@ function App() {
                       }))
                     }
                   >
-                    クリア
+                    {t.modelEdit.clear}
                   </button>
                 </div>
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Floor</th>
-                      <th>重量[kN]</th>
-                      <th>振動数[Hz]</th>
+                      <th>{t.modelEdit.floor}</th>
+                      <th>{t.modelEdit.weight}</th>
+                      <th>{t.modelEdit.frequency}</th>
                       <th />
                     </tr>
                   </thead>
@@ -1091,7 +1125,7 @@ function App() {
                               }))
                             }
                           >
-                            削除
+                            {t.modelEdit.delete}
                           </button>
                         </td>
                       </tr>
@@ -1106,29 +1140,29 @@ function App() {
 
         {activeMenu === "eigen" && (
           <section className="panel">
-            <h2>Eigen Mode Check</h2>
+            <h2>{t.eigenMode.title}</h2>
             <div className="row">
               <select
                 value={eigenModelPath}
                 onChange={(event) => setEigenModelPath(event.target.value)}
               >
-                <option value="">Select model</option>
+                <option value="">{t.eigenMode.selectModel}</option>
                 {modelFiles.map((file) => (
                   <option key={file.path} value={file.path}>
                     {fileNameFromPath(file.path)}
                   </option>
                 ))}
               </select>
-              <button onClick={handleComputeEigen}>Compute</button>
+              <button onClick={handleComputeEigen}>{t.eigenMode.compute}</button>
             </div>
             {eigenResult && (
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>次数</th>
-                    <th>振動数[Hz]</th>
-                    <th>Effective Mass Ratio</th>
-                    <th>刺激係数</th>
+                    <th>{t.eigenMode.order}</th>
+                    <th>{t.eigenMode.naturalFreq}</th>
+                    <th>{t.eigenMode.effectiveMassRatio}</th>
+                    <th>{t.eigenMode.participationFactor}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1148,11 +1182,11 @@ function App() {
 
         {activeMenu === "sine" && (
           <section className="panel">
-            <h2>Sine Wave for Force Input</h2>
+            <h2>{t.sineWave.title}</h2>
             <div className="grid-two">
               <div>
                 <label>
-                  振動数[Hz]
+                  {t.sineWave.frequency}
                   <input
                     type="number"
                     min={0.01}
@@ -1167,7 +1201,7 @@ function App() {
                   />
                 </label>
                 <label>
-                  漸増回数
+                  {t.sineWave.preCycles}
                   <input
                     type="number"
                     min={0}
@@ -1181,7 +1215,7 @@ function App() {
                   />
                 </label>
                 <label>
-                  定常回数
+                  {t.sineWave.harmonicCycles}
                   <input
                     type="number"
                     min={1}
@@ -1195,7 +1229,7 @@ function App() {
                   />
                 </label>
                 <label>
-                  漸減回数
+                  {t.sineWave.postCycles}
                   <input
                     type="number"
                     min={0}
@@ -1219,23 +1253,23 @@ function App() {
                       }))
                     }
                   />
-                  加振後の残り観測を追加
+                  {t.sineWave.addObservation}
 
                 </label>
                 <div className="row">
-                  <button onClick={handleGenerateSine}>波形生成</button>
+                  <button onClick={handleGenerateSine}>{t.sineWave.generate}</button>
                   <input
                     value={sineFileName}
                     onChange={(event) => setSineFileName(event.target.value)}
                   />
-                  <button onClick={() => void handleSaveSine()}>Save to ForceWave</button>
+                  <button onClick={() => void handleSaveSine()}>{t.sineWave.saveToForceWave}</button>
                 </div>
               </div>
               <div>
                 <LineChart
-                  title="正弦波"
-                  xLabel="Time [s]"
-                  yLabel="Amplitude"
+                  title={t.sineWave.amplitude}
+                  xLabel={t.sineWave.time}
+                  yLabel={t.sineWave.amplitude}
                   series={[
                     {
                       name: "sin",
@@ -1253,13 +1287,13 @@ function App() {
 
         {activeMenu === "wave" && (
           <section className="panel">
-            <h2>Input Wave Analysis</h2>
+            <h2>{t.waveAnalysis.title}</h2>
             <div className="row">
               <select
                 value={effectiveWaveTargetPath}
                 onChange={(event) => setWaveTargetPath(event.target.value)}
               >
-                <option value="">Select wave</option>
+                <option value="">{t.waveAnalysis.selectWave}</option>
                 {waveFiles.map((file) => (
                   <option key={file.path} value={file.path}>
                     {file.path}
@@ -1271,33 +1305,33 @@ function App() {
                   </option>
                 ))}
               </select>
-              <button onClick={() => void handleAnalyzeWave()}>Run Analysis</button>
+              <button onClick={() => void handleAnalyzeWave()}>{t.waveAnalysis.runAnalysis}</button>
             </div>
             <div className="row">
               <select
                 value={existingAvdPath}
                 onChange={(event) => setExistingAvdPath(event.target.value)}
               >
-                <option value="">Select existing AVD</option>
+                <option value="">{t.waveAnalysis.selectExistingAvd}</option>
                 {avdFiles.map((file) => (
                   <option key={file.path} value={file.path}>
                     {file.path}
                   </option>
                 ))}
               </select>
-              <button onClick={handleLoadExistingWaveAnalysis}>既存結果読込</button>
+              <button onClick={handleLoadExistingWaveAnalysis}>{t.waveAnalysis.loadExisting}</button>
             </div>
             {waveAnalysisResult && (
               <>
                 <div className="summary-grid">
-                  <div>Amax: {waveAnalysisResult.amax.toFixed(3)} gal</div>
-                  <div>Vmax: {waveAnalysisResult.vmax.toFixed(3)} kine</div>
-                  <div>Dmax: {waveAnalysisResult.dmax.toFixed(3)} cm</div>
-                  <div>継続時間・ {(waveAnalysisResult.time.length * 0.01).toFixed(2)} s</div>
+                  <div>{t.waveAnalysis.amax}: {waveAnalysisResult.amax.toFixed(3)} gal</div>
+                  <div>{t.waveAnalysis.vmax}: {waveAnalysisResult.vmax.toFixed(3)} kine</div>
+                  <div>{t.waveAnalysis.dmax}: {waveAnalysisResult.dmax.toFixed(3)} cm</div>
+                  <div>{t.waveAnalysis.duration}: {(waveAnalysisResult.time.length * 0.01).toFixed(2)} s</div>
                 </div>
                 <div className="grid-two">
                   <LineChart
-                    title="Acceleration"
+                    title={t.waveAnalysis.acceleration}
                     xLabel="Time [s]"
                     yLabel="A [gal]"
                     series={[
@@ -1310,7 +1344,7 @@ function App() {
                     ]}
                   />
                   <LineChart
-                    title="Velocity"
+                    title={t.waveAnalysis.velocity}
                     xLabel="Time [s]"
                     yLabel="V [kine]"
                     series={[
@@ -1325,7 +1359,7 @@ function App() {
                 </div>
                 <div className="grid-two">
                   <LineChart
-                    title="Displacement"
+                    title={t.waveAnalysis.displacement}
                     xLabel="Time [s]"
                     yLabel="D [cm]"
                     series={[
@@ -1338,7 +1372,7 @@ function App() {
                     ]}
                   />
                   <LineChart
-                    title="Spectrum"
+                    title={t.waveAnalysis.spectrum}
                     xLabel="Period [s]"
                     yLabel="Sa"
                     series={[
@@ -1354,32 +1388,34 @@ function App() {
               </>
             )}
             <p className="note">
-              解析時に `WaveAnalysis/avd` と `WaveAnalysis/spectrum` へCSVを保存します・            </p>
+              {t.waveAnalysis.note}
+            </p>
           </section>
         )}
 
         {activeMenu === "base" && (
           <section className="panel">
-            <h2>Base Input Response</h2>
+            <h2>{t.baseResponse.title}</h2>
             <div className="row">
               <select
                 value={effectiveBaseWavePath}
                 onChange={(event) => setBaseWavePath(event.target.value)}
               >
-                <option value="">Select wave</option>
+                <option value="">{t.baseResponse.selectWave}</option>
                 {waveFiles.map((file) => (
                   <option key={file.path} value={file.path}>
                     {file.path}
                   </option>
                 ))}
               </select>
-              <button onClick={() => void handleRunBaseResponse()}>Run Response</button>
+              <button onClick={() => void handleRunBaseResponse()}>{t.baseResponse.runResponse}</button>
               <input
                 value={baseViewGroupName}
                 onChange={(event) => setBaseViewGroupName(event.target.value)}
               />
               <button onClick={() => void saveResponseResults(baseResults, baseViewGroupName)}>
-                結果CSV出力・読込              </button>
+                {t.baseResponse.saveResults}
+              </button>
             </div>
             {renderModelSelectionTable(normalizedBaseSelections, updateBaseSelections)}
             <div className="row">
@@ -1389,13 +1425,13 @@ function App() {
                   checked={showTmdTrace}
                   onChange={(event) => setShowTmdTrace(event.target.checked)}
                 />
-                TMDを描画
+                {t.baseResponse.showTmd}
               </label>
               <select
                 value={baseActiveResultName}
                 onChange={(event) => setBaseActiveResultName(event.target.value)}
               >
-                <option value="">Select result</option>
+                <option value="">{t.baseResponse.selectResult}</option>
                 {baseResults.map((result) => (
                   <option key={result.name} value={result.name}>
                     {result.name}
@@ -1403,17 +1439,18 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(baseActiveResult)}>
-                選択結果をダウンロード              </button>
+                {t.baseResponse.downloadResult}
+              </button>
             </div>
             {baseResults.length > 0 && (
               <table className="data-table compact">
                 <thead>
                   <tr>
-                    <th>解析名</th>
-                    <th>Main Amax</th>
-                    <th>Main Dmax</th>
-                    <th>TMD Amax</th>
-                    <th>TMD Dmax</th>
+                    <th>{t.baseResponse.analysisName}</th>
+                    <th>{t.baseResponse.mainAmax}</th>
+                    <th>{t.baseResponse.mainDmax}</th>
+                    <th>{t.baseResponse.tmdAmax}</th>
+                    <th>{t.baseResponse.tmdDmax}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1434,13 +1471,13 @@ function App() {
             )}
             <div className="grid-two">
               <LineChart
-                title="絶対加速度"
+                title={t.baseResponse.absoluteAcceleration}
                 xLabel="Time [s]"
                 yLabel="gal"
                 series={baseSeries.acc}
               />
               <LineChart
-                title="Response Displacement"
+                title={t.baseResponse.responseDisplacement}
                 xLabel="Time [s]"
                 yLabel="cm"
                 series={baseSeries.dis}
@@ -1451,14 +1488,14 @@ function App() {
 
         {activeMenu === "view" && (
           <section className="panel">
-            <h2>Response View (Reload CSV)</h2>
+            <h2>{t.resultView.title}</h2>
             <div className="row">
-              <button onClick={handleLoadViewResults}>選択CSVを表示</button>
+              <button onClick={handleLoadViewResults}>{t.resultView.showSelected}</button>
               <select
                 value={viewActiveResultName}
                 onChange={(event) => setViewActiveResultName(event.target.value)}
               >
-                <option value="">Select view target</option>
+                <option value="">{t.resultView.selectViewTarget}</option>
                 {viewResults.map((result) => (
                   <option key={result.name} value={result.name}>
                     {result.name}
@@ -1466,9 +1503,10 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(viewActiveResult)}>
-                選択結果をダウンロード              </button>
+                {t.resultView.downloadResult}
+              </button>
               <label className="file-btn">
-                CSV追加
+                {t.resultView.addCsv}
                 <input
                   type="file"
                   accept=".csv"
@@ -1483,8 +1521,8 @@ function App() {
             <table className="data-table compact">
               <thead>
                 <tr>
-                  <th>表示</th>
-                  <th>CSVパス</th>
+                  <th>{t.resultView.display}</th>
+                  <th>{t.resultView.csvPath}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1504,13 +1542,13 @@ function App() {
             </table>
             <div className="grid-two">
               <LineChart
-                title="再読込 加速度"
+                title={t.resultView.reloadAcceleration}
                 xLabel="Time [s]"
                 yLabel="gal"
                 series={viewSeries.acc}
               />
               <LineChart
-                title="View Displacement"
+                title={t.resultView.viewDisplacement}
                 xLabel="Time [s]"
                 yLabel="cm"
                 series={viewSeries.dis}
@@ -1521,12 +1559,12 @@ function App() {
 
         {activeMenu === "force" && (
           <section className="panel">
-            <h2>Force Response Analysis</h2>
+            <h2>{t.forceResponse.title}</h2>
             <div className="row">
               <input
                 value={forceName}
                 onChange={(event) => setForceName(event.target.value)}
-                placeholder="強制力名"
+                placeholder={t.forceResponse.forceName}
               />
               <button
                 onClick={() =>
@@ -1541,18 +1579,19 @@ function App() {
                   ])
                 }
               >
-                強制力追加
+                {t.forceResponse.addForce}
               </button>
-              <button onClick={() => void handleRunForceResponse()}>Run Response</button>
+              <button onClick={() => void handleRunForceResponse()}>{t.forceResponse.runResponse}</button>
               <button onClick={() => void saveResponseResults(forceResults, baseViewGroupName)}>
-                結果CSV出力・読込              </button>
+                {t.forceResponse.saveResults}
+              </button>
             </div>
             <table className="data-table compact">
               <thead>
                 <tr>
-                  <th>作用波</th>
-                  <th>Floor</th>
-                  <th>最大強制力[kN]</th>
+                  <th>{t.forceResponse.applyWave}</th>
+                  <th>{t.forceResponse.floor}</th>
+                  <th>{t.forceResponse.maxForce}</th>
                   <th />
                 </tr>
               </thead>
@@ -1572,7 +1611,7 @@ function App() {
                           )
                         }
                       >
-                        <option value="">Select force wave</option>
+                        <option value="">{t.forceResponse.selectForceWave}</option>
                         {forceWaveFiles.map((file) => (
                           <option key={file.path} value={file.path}>
                             {file.path}
@@ -1629,7 +1668,7 @@ function App() {
                           )
                         }
                       >
-                        削除
+                        {t.forceResponse.delete}
                       </button>
                     </td>
                   </tr>
@@ -1642,7 +1681,7 @@ function App() {
                 value={forceActiveResultName}
                 onChange={(event) => setForceActiveResultName(event.target.value)}
               >
-                <option value="">Select result</option>
+                <option value="">{t.forceResponse.selectResult}</option>
                 {forceResults.map((result) => (
                   <option key={result.name} value={result.name}>
                     {result.name}
@@ -1650,17 +1689,18 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(forceActiveResult)}>
-                選択結果をダウンロード              </button>
+                {t.forceResponse.downloadResult}
+              </button>
             </div>
             <div className="grid-two">
               <LineChart
-                title="強制力・絶対加速度"
+                title={t.forceResponse.forceAcceleration}
                 xLabel="Time [s]"
                 yLabel="gal"
                 series={forceSeries.acc}
               />
               <LineChart
-                title="Force Response Displacement"
+                title={t.forceResponse.forceDisplacement}
                 xLabel="Time [s]"
                 yLabel="cm"
                 series={forceSeries.dis}
@@ -1670,9 +1710,12 @@ function App() {
         )}
 
         <footer className="footer-note">
-          C#元数値仕様・ Newmark-ﾎｲ (ﾎｳ=0.5, ﾎｲ=0.25, dt=0.01), g=9.80665,
-          dat/csv莠呈鋤, Shift_JIS入力対応・        </footer>
+          {t.footer.license}
+        </footer>
       </main>
+
+      <HelpManual isOpen={showHelp} onClose={() => setShowHelp(false)} translations={t} />
+      <Favicon theme={theme} />
     </div>
   );
 }
