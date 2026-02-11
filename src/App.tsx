@@ -77,9 +77,6 @@ interface ForceRow {
 
 type SelectionUpdater = (updater: (prev: ModelSelection[]) => ModelSelection[]) => void;
 
-// Menu keys for type safety
-const MENU_KEYS = ["model", "eigen", "sine", "wave", "base", "view", "force"] as const;
-
 function normalizeModelSelection(
   previous: ModelSelection[],
   modelPaths: string[],
