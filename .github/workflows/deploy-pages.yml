@@ -1,7 +1,9 @@
-name: Deploy GitHub Pages
+name: Build, Test and Deploy to GitHub Pages
 
 on:
   push:
+    branches: ["main", "master"]
+  pull_request:
     branches: ["main", "master"]
   workflow_dispatch:
 
@@ -11,11 +13,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  test-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,22 +29,33 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install
+      - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: TypeScript type check
+        run: npx tsc --noEmit
+
+      - name: Build for production
         run: npm run build
+        env:
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
 
       - name: Setup Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
-    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test-and-build
     runs-on: ubuntu-latest
     environment:
       name: github-pages

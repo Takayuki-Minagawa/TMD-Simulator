@@ -40,16 +40,28 @@ npm run build
 ## GitHub Pages デプロイ
 
 - ワークフロー: `.github/workflows/deploy-pages.yml`
-- `main` または `master` への push で自動デプロイ
-- Vite の `base` は `VITE_BASE_PATH` で上書き可能（未指定時 `./`）
+- `main` または `master` への push / Pull Request で自動実行
+- 実行内容:
+  - ESLint チェック（`npm run lint`）
+  - TypeScript 型チェック（`tsc --noEmit`）
+  - ビルド（`npm run build`）
+  - main ブランチへの push 時のみ GitHub Pages へ自動デプロイ
+- Vite の `base` は GitHub Actions でリポジトリ名から自動設定されます
 
-例:
+ローカルでビルドする場合:
 
 ```bash
-# リポジトリ名が tmd-simulator-web の場合
-set VITE_BASE_PATH=/tmd-simulator-web/
+# リポジトリ名が TMD-Simulator の場合
+export VITE_BASE_PATH=/TMD-Simulator/
 npm run build
 ```
+
+### GitHub Pages の初回設定
+
+1. GitHubリポジトリの「Settings」→「Pages」に移動
+2. 「Source」を「GitHub Actions」に設定
+3. `main` ブランチに push すると自動的にビルド・デプロイされます
+4. デプロイ完了後、`https://<ユーザー名>.github.io/<リポジトリ名>/` でアクセス可能
 
 ## データ互換仕様
 
