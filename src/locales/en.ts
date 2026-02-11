@@ -3,7 +3,7 @@ import type { Translations } from '../types/translations';
 export const en: Translations = {
   app: {
     title: 'TMD-Simulator Web',
-    subtitle: 'GitHub Pages Static SPA',
+    subtitle: 'TMD Response Analysis Tool',
     loading: 'Initializing...',
   },
 

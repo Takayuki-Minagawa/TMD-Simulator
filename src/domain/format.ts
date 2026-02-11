@@ -37,6 +37,10 @@ function normalizeStoryArray(data: number[], storyCount: number): number[] {
 }
 
 export function parseModelDat(text: string, fallbackName = "Model"): ModelData {
+  if (!text || text.trim().length === 0) {
+    throw new Error("モデルファイルが空です。データが含まれているか確認してください。");
+  }
+
   let name = fallbackName;
   let storyCount = 0;
   let weights: number[] = [];
@@ -44,56 +48,68 @@ export function parseModelDat(text: string, fallbackName = "Model"): ModelData {
   let damp: number[] = [];
   const tmdList: TmdSetting[] = [];
 
-  for (const rawLine of text.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith("#")) {
-      continue;
+  try {
+    for (const rawLine of text.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith("#")) {
+        continue;
+      }
+
+      const columns = parseCsvLine(line);
+      const key = columns[0];
+      switch (key) {
+        case "NAME":
+          name = columns[1] ?? fallbackName;
+          break;
+        case "質点数":
+          storyCount = Math.max(1, Math.floor(toNumber(columns[1] ?? "0")));
+          break;
+        case "重量[kN]":
+          weights = columns.slice(1).map(toNumber);
+          break;
+        case "剛性[kN/cm]":
+          stiffness = columns.slice(1).map(toNumber);
+          break;
+        case "付加減衰係数[kN/kine]":
+          damp = columns.slice(1).map(toNumber);
+          break;
+        case "TMD":
+          if (columns.length >= 4) {
+            tmdList.push({
+              floor: Math.floor(toNumber(columns[1])),
+              weightKn: toNumber(columns[2]),
+              freqHz: toNumber(columns[3]),
+            });
+          }
+          break;
+        default:
+          break;
+      }
     }
 
-    const columns = parseCsvLine(line);
-    const key = columns[0];
-    switch (key) {
-      case "NAME":
-        name = columns[1] ?? fallbackName;
-        break;
-      case "質点数":
-        storyCount = Math.max(1, Math.floor(toNumber(columns[1] ?? "0")));
-        break;
-      case "重量[kN]":
-        weights = columns.slice(1).map(toNumber);
-        break;
-      case "剛性[kN/cm]":
-        stiffness = columns.slice(1).map(toNumber);
-        break;
-      case "付加減衰係数[kN/kine]":
-        damp = columns.slice(1).map(toNumber);
-        break;
-      case "TMD":
-        if (columns.length >= 4) {
-          tmdList.push({
-            floor: Math.floor(toNumber(columns[1])),
-            weightKn: toNumber(columns[2]),
-            freqHz: toNumber(columns[3]),
-          });
-        }
-        break;
-      default:
-        break;
+    if (storyCount <= 0) {
+      storyCount = Math.max(weights.length, stiffness.length, damp.length, 1);
     }
-  }
 
-  if (storyCount <= 0) {
-    storyCount = Math.max(weights.length, stiffness.length, damp.length, 1);
-  }
+    // Validate that we have minimum required data
+    if (storyCount <= 0 || (weights.length === 0 && stiffness.length === 0)) {
+      throw new Error("モデルデータが不完全です。質点数、重量、剛性の情報が必要です。");
+    }
 
-  return {
-    name,
-    storyCount,
-    weightsKn: normalizeStoryArray(weights, storyCount),
-    stiffnessKnPerCm: normalizeStoryArray(stiffness, storyCount),
-    extraDampingKnPerKine: normalizeStoryArray(damp, storyCount),
-    tmdList: tmdList.filter((item) => item.floor > 0),
-  };
+    return {
+      name,
+      storyCount,
+      weightsKn: normalizeStoryArray(weights, storyCount),
+      stiffnessKnPerCm: normalizeStoryArray(stiffness, storyCount),
+      extraDampingKnPerKine: normalizeStoryArray(damp, storyCount),
+      tmdList: tmdList.filter((item) => item.floor > 0),
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`モデル解析エラー: ${error.message}`);
+    }
+    throw error;
+  }
 }
 
 export function serializeModelDat(model: ModelData): string {
@@ -116,11 +132,35 @@ export function serializeModelDat(model: ModelData): string {
 }
 
 export function parseWaveCsv(text: string): number[] {
-  return text
+  if (!text || text.trim().length === 0) {
+    throw new Error("CSVファイルが空です。データが含まれているか確認してください。");
+  }
+
+  const lines = text
     .split(/\r?\n/)
     .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .map((line) => toNumber(parseCsvLine(line)[0] ?? "0"));
+    .filter((line) => line.length > 0);
+
+  if (lines.length === 0) {
+    throw new Error("CSVファイルに有効なデータ行がありません。");
+  }
+
+  try {
+    const values = lines.map((line, index) => {
+      const value = toNumber(parseCsvLine(line)[0] ?? "0");
+      if (!Number.isFinite(value)) {
+        throw new Error(`${index + 1}行目: 数値に変換できません ("${line}")`);
+      }
+      return value;
+    });
+
+    return values;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`CSV解析エラー: ${error.message}`);
+    }
+    throw error;
+  }
 }
 
 export function serializeWaveCsv(wave: number[]): string {

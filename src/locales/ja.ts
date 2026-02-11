@@ -3,7 +3,7 @@ import type { Translations } from '../types/translations';
 export const ja: Translations = {
   app: {
     title: 'TMD-Simulator Web',
-    subtitle: 'GitHub Pages Static SPA',
+    subtitle: 'TMD応答解析ツール',
     loading: '初期化中...',
   },
 
