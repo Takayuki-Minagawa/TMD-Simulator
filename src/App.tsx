@@ -136,7 +136,7 @@ function App() {
   const [activeMenu, setActiveMenu] = useState<MenuKey>("model");
   const [files, setFiles] = useState<WorkspaceFile[]>([]);
 
-  const [modelDraft, setModelDraft] = useState<ModelData>(createEmptyModel("ModelA"));
+  const [modelDraft, setModelDraft] = useState<ModelData>(createEmptyModel());
   const [selectedModelPath, setSelectedModelPath] = useState("");
 
   const [eigenModelPath, setEigenModelPath] = useState("");
@@ -931,7 +931,7 @@ function App() {
               </button>
               <button
                 onClick={() => {
-                  setModelDraft(createEmptyModel("ModelA"));
+                  setModelDraft(createEmptyModel());
                   setSelectedModelPath("");
                 }}
               >

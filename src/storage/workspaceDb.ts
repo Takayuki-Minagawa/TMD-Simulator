@@ -110,7 +110,7 @@ export async function initializeWorkspace(): Promise<void> {
     return;
   }
 
-  const model = createEmptyModel("ModelA");
+  const model = createEmptyModel("Sample_3F_TMD");
   const sampleWave = createSampleWave();
   const forceWave = makeSineWave({
     freqHz: 3,
@@ -122,15 +122,15 @@ export async function initializeWorkspace(): Promise<void> {
 
   await putFiles([
     {
-      path: "model/ModelA.dat",
+      path: "model/Sample_3F_TMD.dat",
       content: serializeModelDat(model),
     },
     {
-      path: "Wave/SampleWave.csv",
+      path: "Wave/Sample_Sin1.2Hz.csv",
       content: serializeWaveCsv(sampleWave),
     },
     {
-      path: "ForceWave/Freq0300_001.csv",
+      path: "ForceWave/Sample_Sin3Hz.csv",
       content: serializeWaveCsv(forceWave),
     },
     {

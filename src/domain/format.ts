@@ -17,7 +17,7 @@ function parseCsvLine(line: string): string[] {
   return line.split(",").map((value) => value.trim());
 }
 
-export function createEmptyModel(name = "ModelA"): ModelData {
+export function createEmptyModel(name = "NewModel"): ModelData {
   return {
     name,
     storyCount: 3,
