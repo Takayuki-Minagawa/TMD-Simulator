@@ -128,7 +128,7 @@ export function serializeModelDat(model: ModelData): string {
   for (const tmd of model.tmdList) {
     lines.push(`TMD,${Math.floor(tmd.floor)},${tmd.weightKn},${tmd.freqHz}`);
   }
-  return lines.join("\r\n");
+  return lines.join("\n");
 }
 
 export function parseWaveCsv(text: string): number[] {
@@ -164,7 +164,7 @@ export function parseWaveCsv(text: string): number[] {
 }
 
 export function serializeWaveCsv(wave: number[]): string {
-  return wave.map((value) => `${value}`).join("\r\n");
+  return wave.map((value) => `${value}`).join("\n");
 }
 
 export function serializeResponseCsv(result: ResponseResult): string {
@@ -213,7 +213,7 @@ export function serializeResponseCsv(result: ResponseResult): string {
     lines.push(row.join(","));
   }
 
-  return lines.join("\r\n");
+  return lines.join("\n");
 }
 
 export function parseResponseCsv(text: string, fallbackName: string): ResponseResult {

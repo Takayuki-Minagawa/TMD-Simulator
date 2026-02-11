@@ -69,16 +69,6 @@ export function decodeTextAuto(data: ArrayBuffer | Uint8Array): string {
   }
 }
 
-export function encodeShiftJis(text: string): Uint8Array {
-  const unicodeArray = Array.from(text).map((char) => char.charCodeAt(0));
-  const sjisArray = Encoding.convert(unicodeArray, {
-    from: "UNICODE",
-    to: "SJIS",
-    type: "array",
-  }) as number[];
-  return new Uint8Array(sjisArray);
-}
-
 export function triggerDownload(
   blob: Blob,
   fileName: string,

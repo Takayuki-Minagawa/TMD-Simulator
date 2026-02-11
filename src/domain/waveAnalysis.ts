@@ -283,7 +283,7 @@ export function createAvdCsv(data: IntegrationResult): string {
   for (let i = 0; i < data.time.length; i += 1) {
     lines.push(`${data.time[i]},${data.acc[i]},${data.vel[i]},${data.dis[i]}`);
   }
-  return lines.join("\r\n");
+  return lines.join("\n");
 }
 
 export function createSpectrumCsv(
@@ -302,7 +302,7 @@ export function createSpectrumCsv(
   for (const row of spectrum.rows) {
     lines.push(row.join(","));
   }
-  return lines.join("\r\n");
+  return lines.join("\n");
 }
 
 export function analyzeWave(wave: number[], dampingList = [0.05]): WaveAnalysisResult {

@@ -134,9 +134,9 @@ export async function initializeWorkspace(): Promise<void> {
       content: serializeWaveCsv(forceWave),
     },
     {
-      path: "変位Viewデータ/README.txt",
+      path: "DisplacementView/README.txt",
       content:
-        "このフォルダーには再読込表示用の結果CSVを配置します。\r\nResult/his からコピーして利用できます。",
+        "このフォルダーには再読込表示用の結果CSVを配置します。\nResult/his からコピーして利用できます。",
     },
   ]);
 }

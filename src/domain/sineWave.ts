@@ -12,8 +12,7 @@ export function makeSineWave(input: SineWaveInput): number[] {
   const f = Math.max(0.01, input.freqHz);
   const d0 = 1.0;
 
-  // C#実装互換: preCyclesは参照されずpostCyclesを双方に使用している。
-  const n0 = Math.max(0, Math.floor(input.postCycles));
+  const n0 = Math.max(0, Math.floor(input.preCycles));
   const n1 = Math.max(1, Math.floor(input.harmonicCycles));
   const n2 = Math.max(0, Math.floor(input.postCycles));
 

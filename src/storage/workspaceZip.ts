@@ -1,7 +1,6 @@
 import JSZip from "jszip";
 import {
   decodeTextAuto,
-  encodeShiftJis,
   triggerDownload,
 } from "@/domain/encoding.ts";
 import { listAllFiles, putFiles, normalizePath } from "@/storage/workspaceDb.ts";
@@ -10,7 +9,7 @@ export async function exportWorkspaceZip(fileName = "tmd-workspace.zip"): Promis
   const files = await listAllFiles();
   const zip = new JSZip();
   for (const file of files) {
-    zip.file(file.path, encodeShiftJis(file.content));
+    zip.file(file.path, file.content);
   }
   const blob = await zip.generateAsync({ type: "blob" });
   triggerDownload(blob, fileName);

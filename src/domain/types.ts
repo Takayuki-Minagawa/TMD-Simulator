@@ -1,3 +1,5 @@
+export const MAX_STORIES = 9;
+
 export const REQUIRED_FOLDERS = [
   "model",
   "Wave",
@@ -5,7 +7,7 @@ export const REQUIRED_FOLDERS = [
   "WaveAnalysis/avd",
   "WaveAnalysis/spectrum",
   "Result/his",
-  "変位Viewデータ",
+  "DisplacementView",
 ] as const;
 
 export type WorkspaceFolder = (typeof REQUIRED_FOLDERS)[number];

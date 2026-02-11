@@ -111,7 +111,7 @@ npm run build
 - 強制力波: `ForceWave/*.csv`
 - 解析結果: `Result/his/*_res.csv`
 - 入力波解析: `WaveAnalysis/avd`, `WaveAnalysis/spectrum`
-- 再読込データ: `変位Viewデータ`
+- 再読込データ: `DisplacementView`（旧名 `変位Viewデータ` も読込対応）
 
 ### サポートするエンコーディング
 - **UTF-8**（BOMあり/なし）- 推奨
@@ -169,6 +169,13 @@ npm run build
 - CSVパース時のエラーハンドリング強化
 - モデルデータの検証機能追加
 - モデル編集画面でFloor表示を大きい順に変更（上階から表示）
+
+**C#レガシーパターンのクリーンアップ:**
+- 正弦波生成: `preCycles`パラメータが正しく参照されるよう修正
+- ZIP出力をShift-JISからUTF-8に変更（インポートは両方対応）
+- 改行コードをCRLF(`\r\n`)からLF(`\n`)に統一
+- 階数上限9のハードコードを`MAX_STORIES`定数に変更
+- フォルダ名`変位Viewデータ`を`DisplacementView`に英語化（旧名も読込対応）
 
 **技術的改善:**
 - CSS変数によるテーマシステム導入（45+の色変数）

@@ -27,6 +27,9 @@ import {
   createAvdCsv,
   createSpectrumCsv,
 } from "@/domain/waveAnalysis.ts";
+import {
+  MAX_STORIES,
+} from "@/domain/types.ts";
 import type {
   ModalResult,
   ModelData,
@@ -219,7 +222,9 @@ function App() {
   const displacementViewFiles = useMemo(
     () =>
       files.filter(
-        (file) => file.path.startsWith("変位Viewデータ/") && file.path.endsWith(".csv"),
+        (file) =>
+          (file.path.startsWith("DisplacementView/") || file.path.startsWith("変位Viewデータ/")) &&
+          file.path.endsWith(".csv"),
       ),
     [files],
   );
@@ -328,7 +333,7 @@ function App() {
 
   function ensureStoryCount(storyCount: number): void {
     setModelDraft((prev) => {
-      const count = Math.min(9, Math.max(1, Math.floor(storyCount)));
+      const count = Math.min(MAX_STORIES, Math.max(1, Math.floor(storyCount)));
       const normalize = (values: number[]) => {
         const next = values.slice(0, count);
         while (next.length < count) {
@@ -366,7 +371,7 @@ function App() {
     const normalized: ModelData = {
       ...modelDraft,
       name,
-      storyCount: Math.min(9, Math.max(1, modelDraft.storyCount)),
+      storyCount: Math.min(MAX_STORIES, Math.max(1, modelDraft.storyCount)),
     };
     await putFile(`model/${name}.dat`, serializeModelDat(normalized));
     await setNoticeAndRefresh(t.messages.modelSaved);
@@ -537,7 +542,7 @@ function App() {
       });
       if (normalizedGroup) {
         payload.push({
-          path: `変位Viewデータ/${normalizedGroup}/${result.name}_res.csv`,
+          path: `DisplacementView/${normalizedGroup}/${result.name}_res.csv`,
           content: csv,
         });
       }
@@ -625,7 +630,7 @@ function App() {
     for (const file of Array.from(filesToUpload)) {
       const content = decodeTextAuto(await file.arrayBuffer());
       payload.push({
-        path: `変位Viewデータ/${file.name}`,
+        path: `DisplacementView/${file.name}`,
         content,
       });
     }
@@ -950,7 +955,7 @@ function App() {
                   <input
                     type="number"
                     min={1}
-                    max={9}
+                    max={MAX_STORIES}
                     value={modelDraft.storyCount}
                     onChange={(event) =>
                       ensureStoryCount(Number.parseInt(event.target.value, 10))
@@ -1633,7 +1638,7 @@ function App() {
                           )
                         }
                       >
-                        {Array.from({ length: 9 }, (_, i) => i).map((value) => (
+                        {Array.from({ length: MAX_STORIES }, (_, i) => i).map((value) => (
                           <option key={value} value={value}>
                             {value + 2}F
                           </option>
