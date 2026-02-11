@@ -1379,7 +1379,7 @@ function App() {
                 onChange={(event) => setBaseViewGroupName(event.target.value)}
               />
               <button onClick={() => void saveResponseResults(baseResults, baseViewGroupName)}>
-                邨先棡CSV蜃ｺ蜉幢ｼ・・・              </button>
+                結果CSV出力・読込              </button>
             </div>
             {renderModelSelectionTable(normalizedBaseSelections, updateBaseSelections)}
             <div className="row">
@@ -1403,7 +1403,7 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(baseActiveResult)}>
-                選択結果をダウンロード・              </button>
+                選択結果をダウンロード              </button>
             </div>
             {baseResults.length > 0 && (
               <table className="data-table compact">
@@ -1466,7 +1466,7 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(viewActiveResult)}>
-                選択結果をダウンロード・              </button>
+                選択結果をダウンロード              </button>
               <label className="file-btn">
                 CSV追加
                 <input
@@ -1545,7 +1545,7 @@ function App() {
               </button>
               <button onClick={() => void handleRunForceResponse()}>Run Response</button>
               <button onClick={() => void saveResponseResults(forceResults, baseViewGroupName)}>
-                邨先棡CSV蜃ｺ蜉幢ｼ・・・              </button>
+                結果CSV出力・読込              </button>
             </div>
             <table className="data-table compact">
               <thead>
@@ -1650,7 +1650,7 @@ function App() {
                 ))}
               </select>
               <button onClick={() => void handleExportResultCsv(forceActiveResult)}>
-                選択結果をダウンロード・              </button>
+                選択結果をダウンロード              </button>
             </div>
             <div className="grid-two">
               <LineChart
