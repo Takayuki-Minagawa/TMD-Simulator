@@ -117,7 +117,7 @@ function bandPassFilter(f: number, fl: number, fh: number, df: number): number {
   if (fl > 1e-5) {
     if (f > fl + 0.3 * bl) {
       filter *= 1;
-    } else if (f < fh - 0.7 * bl) {
+    } else if (f < fl - 0.7 * bl) {
       filter = 0;
     } else {
       filter *= 0.5 * (1 - Math.sin((PI / bl) * (f - fl + 0.7 * bl) + 0.5 * PI));

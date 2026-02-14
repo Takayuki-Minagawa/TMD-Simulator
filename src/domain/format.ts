@@ -13,6 +13,18 @@ function toNumber(value: string): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function parseStrictNumber(value: string, lineNumber: number): number {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    throw new Error(`${lineNumber}行目: 値が空です`);
+  }
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) {
+    throw new Error(`${lineNumber}行目: 数値に変換できません ("${value}")`);
+  }
+  return parsed;
+}
+
 function parseCsvLine(line: string): string[] {
   return line.split(",").map((value) => value.trim());
 }
@@ -147,11 +159,8 @@ export function parseWaveCsv(text: string): number[] {
 
   try {
     const values = lines.map((line, index) => {
-      const value = toNumber(parseCsvLine(line)[0] ?? "0");
-      if (!Number.isFinite(value)) {
-        throw new Error(`${index + 1}行目: 数値に変換できません ("${line}")`);
-      }
-      return value;
+      const firstColumn = parseCsvLine(line)[0] ?? "";
+      return parseStrictNumber(firstColumn, index + 1);
     });
 
     return values;
