@@ -39,7 +39,7 @@ export const en: Translations = {
     save: 'Save',
     modelName: 'Model Name',
     storyCount: 'Story Count',
-    floor: 'Floor',
+    floor: 'Layer',
     weight: 'Weight[kN]',
     stiffness: 'Stiffness[kN/cm]',
     damping: 'Extra Damping[kN/kine]',
@@ -126,7 +126,7 @@ export const en: Translations = {
     runResponse: 'Run Response',
     saveResults: 'Save Results CSV',
     applyWave: 'Apply Wave',
-    floor: 'Floor',
+    floor: 'Layer',
     maxForce: 'Max Force[kN]',
     delete: 'Delete',
     selectResult: 'Select result',
@@ -176,9 +176,9 @@ export const en: Translations = {
         <p>Create and edit building models.</p>
         <ul>
           <li><strong>Story Count</strong>: Number of building stories (1-9)</li>
-          <li><strong>Weight[kN]</strong>: Weight of each floor</li>
-          <li><strong>Stiffness[kN/cm]</strong>: Stiffness of each floor</li>
-          <li><strong>TMD Information</strong>: Set TMD installation floor, weight, and frequency</li>
+          <li><strong>Weight[kN]</strong>: Weight of each layer</li>
+          <li><strong>Stiffness[kN/cm]</strong>: Stiffness of each layer</li>
+          <li><strong>TMD Information</strong>: Set TMD installation layer, weight, and frequency</li>
         </ul>
       `,
       eigenAnalysis: `
@@ -204,7 +204,7 @@ export const en: Translations = {
         <h4>6. Result View</h4>
         <p>Reload and display saved analysis result CSV files.</p>
         <h4>7. Force Response</h4>
-        <p>Perform force input response analysis. Calculate response to external forces acting on each floor.</p>
+        <p>Perform force input response analysis. Calculate response to external forces acting on each layer.</p>
       `,
     },
     dataIO: {
