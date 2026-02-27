@@ -980,50 +980,53 @@ function App() {
                     </tr>
                   </thead>
                   <tbody>
-                    {Array.from({ length: modelDraft.storyCount }, (_, i) => (
-                      <tr key={`story-${i}`}>
-                        <td>{modelDraft.storyCount - i}</td>
-                        <td>
-                          <input
-                            type="number"
-                            value={modelDraft.weightsKn[i] ?? 0}
-                            onChange={(event) =>
-                              updateModelArray(
-                                "weightsKn",
-                                i,
-                                Number.parseFloat(event.target.value),
-                              )
-                            }
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={modelDraft.stiffnessKnPerCm[i] ?? 0}
-                            onChange={(event) =>
-                              updateModelArray(
-                                "stiffnessKnPerCm",
-                                i,
-                                Number.parseFloat(event.target.value),
-                              )
-                            }
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={modelDraft.extraDampingKnPerKine[i] ?? 0}
-                            onChange={(event) =>
-                              updateModelArray(
-                                "extraDampingKnPerKine",
-                                i,
-                                Number.parseFloat(event.target.value),
-                              )
-                            }
-                          />
-                        </td>
-                      </tr>
-                    ))}
+                    {Array.from({ length: modelDraft.storyCount }, (_, i) => {
+                      const dataIndex = modelDraft.storyCount - 1 - i;
+                      return (
+                        <tr key={`story-${i}`}>
+                          <td>{modelDraft.storyCount - i}</td>
+                          <td>
+                            <input
+                              type="number"
+                              value={modelDraft.weightsKn[dataIndex] ?? 0}
+                              onChange={(event) =>
+                                updateModelArray(
+                                  "weightsKn",
+                                  dataIndex,
+                                  Number.parseFloat(event.target.value),
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={modelDraft.stiffnessKnPerCm[dataIndex] ?? 0}
+                              onChange={(event) =>
+                                updateModelArray(
+                                  "stiffnessKnPerCm",
+                                  dataIndex,
+                                  Number.parseFloat(event.target.value),
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              value={modelDraft.extraDampingKnPerKine[dataIndex] ?? 0}
+                              onChange={(event) =>
+                                updateModelArray(
+                                  "extraDampingKnPerKine",
+                                  dataIndex,
+                                  Number.parseFloat(event.target.value),
+                                )
+                              }
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
