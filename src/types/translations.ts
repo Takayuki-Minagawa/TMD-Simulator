@@ -56,6 +56,10 @@ export interface Translations {
     naturalFreq: string;
     effectiveMassRatio: string;
     participationFactor: string;
+    eigenVectorTitle: string;
+    modeShapeTitle: string;
+    floor: string;
+    base: string;
   };
 
   sineWave: {

@@ -58,6 +58,10 @@ export const en: Translations = {
     naturalFreq: 'Natural Freq[Hz]',
     effectiveMassRatio: 'Effective Mass Ratio',
     participationFactor: 'Participation Factor',
+    eigenVectorTitle: 'Eigenvectors (max=1.0 normalized)',
+    modeShapeTitle: 'Stimulation Function Mode Diagram',
+    floor: 'Layer',
+    base: 'Base',
   },
 
   sineWave: {

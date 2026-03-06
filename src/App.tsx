@@ -1,4 +1,6 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+
+const Plot = lazy(() => import("react-plotly.js"));
 import "@/App.css";
 import { LineChart } from "@/components/LineChart.tsx";
 import { decodeTextAuto, triggerDownload } from "@/domain/encoding.ts";
@@ -1169,28 +1171,125 @@ function App() {
               </select>
               <button onClick={handleComputeEigen}>{t.eigenMode.compute}</button>
             </div>
-            {eigenResult && (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>{t.eigenMode.order}</th>
-                    <th>{t.eigenMode.naturalFreq}</th>
-                    <th>{t.eigenMode.effectiveMassRatio}</th>
-                    <th>{t.eigenMode.participationFactor}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {eigenResult.naturalFrequency.map((freq, index) => (
-                    <tr key={`mode-${index}`}>
-                      <td>{index + 1}</td>
-                      <td>{freq.toFixed(4)}</td>
-                      <td>{eigenResult.effectiveMassRatio[index].toFixed(4)}</td>
-                      <td>{eigenResult.participationFactor[index].toFixed(4)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            {eigenResult && (() => {
+              const n = eigenResult.naturalFrequency.length;
+              const modeColors = [
+                "#2b59c3", "#d1495b", "#00798c", "#f18f01",
+                "#8e6c88", "#e63946", "#457b9d", "#2a9d8f", "#e9c46a",
+              ];
+              return (
+                <>
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>{t.eigenMode.order}</th>
+                        <th>{t.eigenMode.naturalFreq}</th>
+                        <th>{t.eigenMode.effectiveMassRatio}</th>
+                        <th>{t.eigenMode.participationFactor}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {eigenResult.naturalFrequency.map((freq, index) => (
+                        <tr key={`mode-${index}`}>
+                          <td>{index + 1}</td>
+                          <td>{freq.toFixed(4)}</td>
+                          <td>{eigenResult.effectiveMassRatio[index].toFixed(4)}</td>
+                          <td>{eigenResult.participationFactor[index].toFixed(4)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  <h3>{t.eigenMode.eigenVectorTitle}</h3>
+                  <table className="data-table compact">
+                    <thead>
+                      <tr>
+                        <th>{t.eigenMode.floor}</th>
+                        {eigenResult.naturalFrequency.map((_, mode) => (
+                          <th key={`evh-${mode}`}>{mode + 1}{t.eigenMode.order}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Array.from({ length: n }, (_, i) => n - 1 - i).map(
+                        (floorIdx) => (
+                          <tr key={`evr-${floorIdx}`}>
+                            <td>{floorIdx + 1}{t.eigenMode.floor}</td>
+                            {eigenResult.eigenVector.map((vec, mode) => (
+                              <td key={`ev-${mode}-${floorIdx}`}>
+                                {vec[floorIdx].toFixed(4)}
+                              </td>
+                            ))}
+                          </tr>
+                        ),
+                      )}
+                    </tbody>
+                  </table>
+
+                  <h3>{t.eigenMode.modeShapeTitle}</h3>
+                  <Suspense
+                    fallback={
+                      <div className="empty-plot">Loading...</div>
+                    }
+                  >
+                    <Plot
+                      data={eigenResult.modeShape.map((shape, mode) => ({
+                        x: [0, ...shape],
+                        y: [
+                          0,
+                          ...Array.from({ length: n }, (_, i) => i + 1),
+                        ],
+                        mode: "lines+markers" as const,
+                        type: "scatter" as const,
+                        name: `${mode + 1}${t.eigenMode.order}`,
+                        line: {
+                          color: modeColors[mode % modeColors.length],
+                          width: 2,
+                        },
+                        marker: { size: 5 },
+                      }))}
+                      layout={{
+                        autosize: true,
+                        height: 400,
+                        margin: { l: 60, r: 20, t: 30, b: 60 },
+                        paper_bgcolor: "rgba(0,0,0,0)",
+                        plot_bgcolor: "rgba(255,255,255,0.82)",
+                        xaxis: {
+                          title: { text: t.eigenMode.modeShapeTitle },
+                          zeroline: true,
+                          zerolinewidth: 2,
+                          gridcolor: "#dbe7f4",
+                        },
+                        yaxis: {
+                          title: { text: t.eigenMode.floor },
+                          dtick: 1,
+                          tick0: 0,
+                          gridcolor: "#dbe7f4",
+                        },
+                        legend: { orientation: "h" as const },
+                        shapes: [
+                          {
+                            type: "line" as const,
+                            x0: 0,
+                            x1: 0,
+                            y0: 0,
+                            y1: n,
+                            line: {
+                              color: "#888",
+                              width: 1,
+                              dash: "dash" as const,
+                            },
+                          },
+                        ],
+                      }}
+                      config={{ displaylogo: false, responsive: true }}
+                      style={{ width: "100%" }}
+                      useResizeHandler
+                    />
+                  </Suspense>
+                </>
+              );
+            })()}
           </section>
         )}
 

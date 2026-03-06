@@ -58,6 +58,10 @@ export const ja: Translations = {
     naturalFreq: '振動数[Hz]',
     effectiveMassRatio: 'Effective Mass Ratio',
     participationFactor: '刺激係数',
+    eigenVectorTitle: '固有ベクトル (最大値1.0基準化)',
+    modeShapeTitle: '刺激関数モード図',
+    floor: '層',
+    base: '基礎',
   },
 
   sineWave: {
