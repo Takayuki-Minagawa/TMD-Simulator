@@ -1177,6 +1177,11 @@ function App() {
                 "#2b59c3", "#d1495b", "#00798c", "#f18f01",
                 "#8e6c88", "#e63946", "#457b9d", "#2a9d8f", "#e9c46a",
               ];
+              const modeLabel = (i: number) =>
+                `${i + 1}${t.eigenMode.orderSuffix}`;
+              const chartHeight = Math.max(320, n * 65 + 90);
+              const layerPx = (chartHeight - 90) / (n + 1);
+              const defaultWidth = Math.max(320, Math.round(layerPx * 3 + 80));
               return (
                 <>
                   <table className="data-table">
@@ -1206,7 +1211,7 @@ function App() {
                       <tr>
                         <th>{t.eigenMode.floor}</th>
                         {eigenResult.naturalFrequency.map((_, mode) => (
-                          <th key={`evh-${mode}`}>{mode + 1}{t.eigenMode.order}</th>
+                          <th key={`evh-${mode}`}>{modeLabel(mode)}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1227,66 +1232,75 @@ function App() {
                   </table>
 
                   <h3>{t.eigenMode.modeShapeTitle}</h3>
-                  <Suspense
-                    fallback={
-                      <div className="empty-plot">Loading...</div>
-                    }
+                  <div
+                    style={{
+                      width: defaultWidth,
+                      minWidth: defaultWidth,
+                      resize: "horizontal",
+                      overflow: "hidden",
+                    }}
                   >
-                    <Plot
-                      data={eigenResult.modeShape.map((shape, mode) => ({
-                        x: [0, ...shape],
-                        y: [
-                          0,
-                          ...Array.from({ length: n }, (_, i) => i + 1),
-                        ],
-                        mode: "lines+markers" as const,
-                        type: "scatter" as const,
-                        name: `${mode + 1}${t.eigenMode.order}`,
-                        line: {
-                          color: modeColors[mode % modeColors.length],
-                          width: 2,
-                        },
-                        marker: { size: 5 },
-                      }))}
-                      layout={{
-                        autosize: true,
-                        height: 400,
-                        margin: { l: 60, r: 20, t: 30, b: 60 },
-                        paper_bgcolor: "rgba(0,0,0,0)",
-                        plot_bgcolor: "rgba(255,255,255,0.82)",
-                        xaxis: {
-                          title: { text: t.eigenMode.modeShapeTitle },
-                          zeroline: true,
-                          zerolinewidth: 2,
-                          gridcolor: "#dbe7f4",
-                        },
-                        yaxis: {
-                          title: { text: t.eigenMode.floor },
-                          dtick: 1,
-                          tick0: 0,
-                          gridcolor: "#dbe7f4",
-                        },
-                        legend: { orientation: "h" as const },
-                        shapes: [
-                          {
-                            type: "line" as const,
-                            x0: 0,
-                            x1: 0,
-                            y0: 0,
-                            y1: n,
-                            line: {
-                              color: "#888",
-                              width: 1,
-                              dash: "dash" as const,
-                            },
+                    <Suspense
+                      fallback={
+                        <div className="empty-plot">Loading...</div>
+                      }
+                    >
+                      <Plot
+                        data={eigenResult.modeShape.map((shape, mode) => ({
+                          x: [0, ...shape],
+                          y: [
+                            0,
+                            ...Array.from({ length: n }, (_, i) => i + 1),
+                          ],
+                          mode: "lines+markers" as const,
+                          type: "scatter" as const,
+                          name: modeLabel(mode),
+                          line: {
+                            color: modeColors[mode % modeColors.length],
+                            width: 2,
                           },
-                        ],
-                      }}
-                      config={{ displaylogo: false, responsive: true }}
-                      style={{ width: "100%" }}
-                      useResizeHandler
-                    />
-                  </Suspense>
+                          marker: { size: 5 },
+                        }))}
+                        layout={{
+                          autosize: true,
+                          height: chartHeight,
+                          margin: { l: 60, r: 20, t: 30, b: 60 },
+                          paper_bgcolor: "rgba(0,0,0,0)",
+                          plot_bgcolor: "rgba(255,255,255,0.82)",
+                          xaxis: {
+                            title: { text: t.eigenMode.modeShapeTitle },
+                            zeroline: true,
+                            zerolinewidth: 2,
+                            gridcolor: "#dbe7f4",
+                          },
+                          yaxis: {
+                            title: { text: t.eigenMode.floor },
+                            dtick: 1,
+                            tick0: 0,
+                            gridcolor: "#dbe7f4",
+                          },
+                          legend: { orientation: "h" as const },
+                          shapes: [
+                            {
+                              type: "line" as const,
+                              x0: 0,
+                              x1: 0,
+                              y0: 0,
+                              y1: n,
+                              line: {
+                                color: "#888",
+                                width: 1,
+                                dash: "dash" as const,
+                              },
+                            },
+                          ],
+                        }}
+                        config={{ displaylogo: false, responsive: true }}
+                        style={{ width: "100%" }}
+                        useResizeHandler
+                      />
+                    </Suspense>
+                  </div>
                 </>
               );
             })()}

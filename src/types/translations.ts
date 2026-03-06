@@ -56,6 +56,7 @@ export interface Translations {
     naturalFreq: string;
     effectiveMassRatio: string;
     participationFactor: string;
+    orderSuffix: string;
     eigenVectorTitle: string;
     modeShapeTitle: string;
     floor: string;
