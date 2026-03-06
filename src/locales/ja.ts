@@ -4,7 +4,7 @@ export const ja: Translations = {
   app: {
     title: 'TMD-Simulator Web',
     subtitle: 'TMD応答解析ツール',
-    version: 'Ver.1.0.1',
+    version: 'Ver.1.0.2',
     loading: '初期化中...',
   },
 
@@ -101,16 +101,20 @@ export const ja: Translations = {
     selectWave: 'Select wave',
     runResponse: 'Run Response',
     saveResults: '結果CSV出力・読込',
-    showTmd: 'TMDを描画',
     selectResult: 'Select result',
     downloadResult: '選択結果をダウンロード',
     analysisName: '解析名',
     mainAmax: 'Main Amax',
     mainDmax: 'Main Dmax',
-    tmdAmax: 'TMD Amax',
-    tmdDmax: 'TMD Dmax',
     absoluteAcceleration: '絶対加速度',
     responseDisplacement: 'Response Displacement',
+    displayAcceleration: '応答加速度',
+    displayInterStoryDis: '層間変位',
+    displayInterStoryVel: '層間速度',
+    animationTitle: '変位アニメーション',
+    animPlay: '再生',
+    animReset: '先頭',
+    animSpeed: '速度',
   },
 
   resultView: {
@@ -207,8 +211,12 @@ export const ja: Translations = {
         <p>入力波の解析を行い、加速度・速度・変位の時刻歴と応答スペクトルを表示します。</p>
         <h4>5. Base Response</h4>
         <p>基礎入力応答解析を実行します。地震波などの基礎加速度入力に対する建物の応答を計算します。</p>
+        <ul>
+          <li><strong>応答波形切替</strong>: 応答加速度・層間変位・層間速度をラジオボタンで選択表示</li>
+          <li><strong>変位アニメーション</strong>: 基礎を原点として各質点の変位を建物形状で時刻歴再生</li>
+        </ul>
         <h4>6. Result View</h4>
-        <p>保存済みの解析結果CSVを再読込して表示します。</p>
+        <p>保存済みの解析結果CSVを再読込して表示します。波形切替・変位アニメーションも利用可能です。</p>
         <h4>7. Force Response</h4>
         <p>強制力入力応答解析を実行します。各階に作用する外力に対する応答を計算します。</p>
       `,

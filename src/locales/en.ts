@@ -4,7 +4,7 @@ export const en: Translations = {
   app: {
     title: 'TMD-Simulator Web',
     subtitle: 'TMD Response Analysis Tool',
-    version: 'Ver.1.0.1',
+    version: 'Ver.1.0.2',
     loading: 'Initializing...',
   },
 
@@ -101,16 +101,20 @@ export const en: Translations = {
     selectWave: 'Select wave',
     runResponse: 'Run Response',
     saveResults: 'Save Results CSV',
-    showTmd: 'Show TMD',
     selectResult: 'Select result',
     downloadResult: 'Download Selected Result',
     analysisName: 'Analysis Name',
     mainAmax: 'Main Amax',
     mainDmax: 'Main Dmax',
-    tmdAmax: 'TMD Amax',
-    tmdDmax: 'TMD Dmax',
     absoluteAcceleration: 'Absolute Acceleration',
     responseDisplacement: 'Response Displacement',
+    displayAcceleration: 'Floor Acceleration',
+    displayInterStoryDis: 'Inter-story Disp.',
+    displayInterStoryVel: 'Inter-story Vel.',
+    animationTitle: 'Displacement Animation',
+    animPlay: 'Play',
+    animReset: 'Reset',
+    animSpeed: 'Speed',
   },
 
   resultView: {
@@ -207,8 +211,12 @@ export const en: Translations = {
         <p>Analyze input waves and display time-history of acceleration, velocity, displacement, and response spectrum.</p>
         <h4>5. Base Response</h4>
         <p>Perform base input response analysis. Calculate building response to base acceleration input such as earthquake waves.</p>
+        <ul>
+          <li><strong>Waveform Toggle</strong>: Switch between floor acceleration, inter-story displacement, and inter-story velocity</li>
+          <li><strong>Displacement Animation</strong>: Animate building deformation over time with playback controls</li>
+        </ul>
         <h4>6. Result View</h4>
-        <p>Reload and display saved analysis result CSV files.</p>
+        <p>Reload and display saved analysis result CSV files. Waveform toggle and displacement animation are also available.</p>
         <h4>7. Force Response</h4>
         <p>Perform force input response analysis. Calculate response to external forces acting on each layer.</p>
       `,

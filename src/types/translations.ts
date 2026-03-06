@@ -99,16 +99,20 @@ export interface Translations {
     selectWave: string;
     runResponse: string;
     saveResults: string;
-    showTmd: string;
     selectResult: string;
     downloadResult: string;
     analysisName: string;
     mainAmax: string;
     mainDmax: string;
-    tmdAmax: string;
-    tmdDmax: string;
     absoluteAcceleration: string;
     responseDisplacement: string;
+    displayAcceleration: string;
+    displayInterStoryDis: string;
+    displayInterStoryVel: string;
+    animationTitle: string;
+    animPlay: string;
+    animReset: string;
+    animSpeed: string;
   };
 
   resultView: {

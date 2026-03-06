@@ -5,6 +5,7 @@ import "@/App.css";
 import { LineChart } from "@/components/LineChart.tsx";
 import { decodeTextAuto, triggerDownload } from "@/domain/encoding.ts";
 import {
+  DT,
   GRAVITY,
   createEmptyModel,
   parseAvdCsv,
@@ -59,7 +60,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { HelpManual } from "@/components/HelpManual";
 import { WelcomeDialog } from "@/components/WelcomeDialog";
+import { BuildingAnimation } from "@/components/BuildingAnimation";
 import { Favicon } from "@/components/Favicon";
+
+type ResponseDisplayMode = "acceleration" | "interStoryDis" | "interStoryVel";
 
 type MenuKey =
   | "model"
@@ -166,7 +170,9 @@ function App() {
   const [baseResults, setBaseResults] = useState<ResponseResult[]>([]);
   const [baseActiveResultName, setBaseActiveResultName] = useState("");
   const [baseViewGroupName, setBaseViewGroupName] = useState("default");
-  const [showTmdTrace, setShowTmdTrace] = useState(true);
+  const [baseDisplayMode, setBaseDisplayMode] = useState<ResponseDisplayMode>("acceleration");
+  const [forceDisplayMode, setForceDisplayMode] = useState<ResponseDisplayMode>("acceleration");
+  const [viewDisplayMode, setViewDisplayMode] = useState<ResponseDisplayMode>("acceleration");
 
   const [forceRows, setForceRows] = useState<ForceRow[]>([]);
   const [forceName, setForceName] = useState("Force");
@@ -817,44 +823,83 @@ function App() {
     );
   }
 
-  function resultSeriesForPlot(result: ResponseResult | null) {
-    if (!result) {
-      return { acc: [], dis: [] };
-    }
+  function computeInterStoryDis(allDis: number[][], floorIndex: number): number[] {
+    if (floorIndex === 0) return allDis[0] ?? [];
+    const upper = allDis[floorIndex] ?? [];
+    const lower = allDis[floorIndex - 1] ?? [];
+    return upper.map((val, i) => val - (lower[i] ?? 0));
+  }
+
+  function differentiateTimeSeries(data: number[]): number[] {
+    return data.map((val, i) => (i === 0 ? 0 : (val - data[i - 1]) / DT));
+  }
+
+  const FLOOR_COLORS = [
+    "#d1495b", "#2b59c3", "#00798c", "#f18f01", "#8e6c88",
+    "#e63946", "#457b9d", "#2a9d8f", "#e9c46a",
+  ];
+
+  function resultSeriesForMode(
+    result: ResponseResult | null,
+    mode: ResponseDisplayMode,
+  ) {
+    if (!result) return [];
     const x = result.time;
-    const top = Math.max(0, result.mainMassCount - 1);
-    const acc = [
-      { name: "入力波", x, y: result.waveAcc, color: "#2b59c3" },
-      {
-        name: `主系絶_${top + 2}F`,
-        x,
-        y: result.mainAcc[top] ?? [],
-        color: "#d1495b",
-      },
-    ];
-    const dis = [
-      {
-        name: `主系相_${top + 2}F`,
-        x,
-        y: result.mainDis[top] ?? [],
-        color: "#00798c",
-      },
-    ];
-    if (showTmdTrace && result.tmdCount > 0) {
-      acc.push({
-        name: "TMD加速度",
-        x,
-        y: result.tmdAcc[0] ?? [],
-        color: "#f18f01",
-      });
-      dis.push({
-        name: "TMD Dis",
-        x,
-        y: result.tmdDis[0] ?? [],
-        color: "#8e6c88",
-      });
+    const n = result.mainMassCount;
+
+    switch (mode) {
+      case "acceleration": {
+        const series = [
+          { name: t.baseResponse.absoluteAcceleration.slice(0, 4) + "(入力)", x, y: result.waveAcc, color: "#999999" },
+        ];
+        for (let i = 0; i < n; i++) {
+          const floorLabel = i === n - 1 ? "RF" : `${i + 2}F`;
+          series.push({
+            name: floorLabel,
+            x,
+            y: result.mainAcc[i] ?? [],
+            color: FLOOR_COLORS[i % FLOOR_COLORS.length],
+          });
+        }
+        return series;
+      }
+      case "interStoryDis": {
+        const series = [];
+        for (let i = 0; i < n; i++) {
+          series.push({
+            name: `${i + 1}${t.modelEdit.floor}`,
+            x,
+            y: computeInterStoryDis(result.mainDis, i),
+            color: FLOOR_COLORS[i % FLOOR_COLORS.length],
+          });
+        }
+        return series;
+      }
+      case "interStoryVel": {
+        const series = [];
+        for (let i = 0; i < n; i++) {
+          const interDis = computeInterStoryDis(result.mainDis, i);
+          series.push({
+            name: `${i + 1}${t.modelEdit.floor}`,
+            x,
+            y: differentiateTimeSeries(interDis),
+            color: FLOOR_COLORS[i % FLOOR_COLORS.length],
+          });
+        }
+        return series;
+      }
     }
-    return { acc, dis };
+  }
+
+  function modeChartLabel(mode: ResponseDisplayMode): { title: string; yLabel: string } {
+    switch (mode) {
+      case "acceleration":
+        return { title: t.baseResponse.displayAcceleration, yLabel: "gal" };
+      case "interStoryDis":
+        return { title: t.baseResponse.displayInterStoryDis, yLabel: "cm" };
+      case "interStoryVel":
+        return { title: t.baseResponse.displayInterStoryVel, yLabel: "kine" };
+    }
   }
 
   if (!ready) {
@@ -872,9 +917,12 @@ function App() {
     { key: "force", label: t.menu.forceResponse },
   ];
 
-  const baseSeries = resultSeriesForPlot(baseActiveResult);
-  const forceSeries = resultSeriesForPlot(forceActiveResult);
-  const viewSeries = resultSeriesForPlot(viewActiveResult);
+  const baseSeries = resultSeriesForMode(baseActiveResult, baseDisplayMode);
+  const baseChartLabel = modeChartLabel(baseDisplayMode);
+  const forceSeries = resultSeriesForMode(forceActiveResult, forceDisplayMode);
+  const forceChartLabel = modeChartLabel(forceDisplayMode);
+  const viewSeries = resultSeriesForMode(viewActiveResult, viewDisplayMode);
+  const viewChartLabel = modeChartLabel(viewDisplayMode);
 
   return (
     <div className="app-shell">
@@ -1575,14 +1623,6 @@ function App() {
             </div>
             {renderModelSelectionTable(normalizedBaseSelections, updateBaseSelections)}
             <div className="row">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={showTmdTrace}
-                  onChange={(event) => setShowTmdTrace(event.target.checked)}
-                />
-                {t.baseResponse.showTmd}
-              </label>
               <select
                 value={baseActiveResultName}
                 onChange={(event) => setBaseActiveResultName(event.target.value)}
@@ -1605,8 +1645,6 @@ function App() {
                     <th>{t.baseResponse.analysisName}</th>
                     <th>{t.baseResponse.mainAmax}</th>
                     <th>{t.baseResponse.mainDmax}</th>
-                    <th>{t.baseResponse.tmdAmax}</th>
-                    <th>{t.baseResponse.tmdDmax}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1617,28 +1655,53 @@ function App() {
                         <td>{result.name}</td>
                         <td>{max.maxMainAcc.toFixed(3)}</td>
                         <td>{max.maxMainDis.toFixed(3)}</td>
-                        <td>{max.maxTmdAcc.toFixed(3)}</td>
-                        <td>{max.maxTmdDis.toFixed(3)}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
             )}
-            <div className="grid-two">
-              <LineChart
-                title={t.baseResponse.absoluteAcceleration}
-                xLabel="Time [s]"
-                yLabel="gal"
-                series={baseSeries.acc}
-              />
-              <LineChart
-                title={t.baseResponse.responseDisplacement}
-                xLabel="Time [s]"
-                yLabel="cm"
-                series={baseSeries.dis}
-              />
+            <div className="row" style={{ gap: "12px", flexWrap: "wrap" }}>
+              {(
+                [
+                  ["acceleration", t.baseResponse.displayAcceleration],
+                  ["interStoryDis", t.baseResponse.displayInterStoryDis],
+                  ["interStoryVel", t.baseResponse.displayInterStoryVel],
+                ] as const
+              ).map(([mode, label]) => (
+                <label key={mode} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <input
+                    type="radio"
+                    name="baseDisplayMode"
+                    value={mode}
+                    checked={baseDisplayMode === mode}
+                    onChange={() => setBaseDisplayMode(mode)}
+                  />
+                  {label}
+                </label>
+              ))}
             </div>
+            <LineChart
+              title={baseChartLabel.title}
+              xLabel="Time [s]"
+              yLabel={baseChartLabel.yLabel}
+              series={baseSeries}
+            />
+            {baseActiveResult && (
+              <>
+                <h3>{t.baseResponse.animationTitle}</h3>
+                <BuildingAnimation
+                  result={baseActiveResult}
+                  translations={{
+                    play: t.baseResponse.animPlay,
+                    pause: "||",
+                    reset: t.baseResponse.animReset,
+                    speed: t.baseResponse.animSpeed,
+                    time: "Time",
+                  }}
+                />
+              </>
+            )}
           </section>
         )}
 
@@ -1696,20 +1759,47 @@ function App() {
                 ))}
               </tbody>
             </table>
-            <div className="grid-two">
-              <LineChart
-                title={t.resultView.reloadAcceleration}
-                xLabel="Time [s]"
-                yLabel="gal"
-                series={viewSeries.acc}
-              />
-              <LineChart
-                title={t.resultView.viewDisplacement}
-                xLabel="Time [s]"
-                yLabel="cm"
-                series={viewSeries.dis}
-              />
+            <div className="row" style={{ gap: "12px", flexWrap: "wrap" }}>
+              {(
+                [
+                  ["acceleration", t.baseResponse.displayAcceleration],
+                  ["interStoryDis", t.baseResponse.displayInterStoryDis],
+                  ["interStoryVel", t.baseResponse.displayInterStoryVel],
+                ] as const
+              ).map(([mode, label]) => (
+                <label key={mode} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <input
+                    type="radio"
+                    name="viewDisplayMode"
+                    value={mode}
+                    checked={viewDisplayMode === mode}
+                    onChange={() => setViewDisplayMode(mode)}
+                  />
+                  {label}
+                </label>
+              ))}
             </div>
+            <LineChart
+              title={viewChartLabel.title}
+              xLabel="Time [s]"
+              yLabel={viewChartLabel.yLabel}
+              series={viewSeries}
+            />
+            {viewActiveResult && (
+              <>
+                <h3>{t.baseResponse.animationTitle}</h3>
+                <BuildingAnimation
+                  result={viewActiveResult}
+                  translations={{
+                    play: t.baseResponse.animPlay,
+                    pause: "||",
+                    reset: t.baseResponse.animReset,
+                    speed: t.baseResponse.animSpeed,
+                    time: "Time",
+                  }}
+                />
+              </>
+            )}
           </section>
         )}
 
@@ -1848,20 +1938,47 @@ function App() {
                 {t.forceResponse.downloadResult}
               </button>
             </div>
-            <div className="grid-two">
-              <LineChart
-                title={t.forceResponse.forceAcceleration}
-                xLabel="Time [s]"
-                yLabel="gal"
-                series={forceSeries.acc}
-              />
-              <LineChart
-                title={t.forceResponse.forceDisplacement}
-                xLabel="Time [s]"
-                yLabel="cm"
-                series={forceSeries.dis}
-              />
+            <div className="row" style={{ gap: "12px", flexWrap: "wrap" }}>
+              {(
+                [
+                  ["acceleration", t.baseResponse.displayAcceleration],
+                  ["interStoryDis", t.baseResponse.displayInterStoryDis],
+                  ["interStoryVel", t.baseResponse.displayInterStoryVel],
+                ] as const
+              ).map(([mode, label]) => (
+                <label key={mode} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <input
+                    type="radio"
+                    name="forceDisplayMode"
+                    value={mode}
+                    checked={forceDisplayMode === mode}
+                    onChange={() => setForceDisplayMode(mode)}
+                  />
+                  {label}
+                </label>
+              ))}
             </div>
+            <LineChart
+              title={forceChartLabel.title}
+              xLabel="Time [s]"
+              yLabel={forceChartLabel.yLabel}
+              series={forceSeries}
+            />
+            {forceActiveResult && (
+              <>
+                <h3>{t.baseResponse.animationTitle}</h3>
+                <BuildingAnimation
+                  result={forceActiveResult}
+                  translations={{
+                    play: t.baseResponse.animPlay,
+                    pause: "||",
+                    reset: t.baseResponse.animReset,
+                    speed: t.baseResponse.animSpeed,
+                    time: "Time",
+                  }}
+                />
+              </>
+            )}
           </section>
         )}
 
