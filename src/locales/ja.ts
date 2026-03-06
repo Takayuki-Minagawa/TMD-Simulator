@@ -4,7 +4,7 @@ export const ja: Translations = {
   app: {
     title: 'TMD-Simulator Web',
     subtitle: 'TMD応答解析ツール',
-    version: 'Ver.1.00',
+    version: 'Ver.1.0.1',
     loading: '初期化中...',
   },
 

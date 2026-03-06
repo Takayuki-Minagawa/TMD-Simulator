@@ -4,7 +4,7 @@ export const en: Translations = {
   app: {
     title: 'TMD-Simulator Web',
     subtitle: 'TMD Response Analysis Tool',
-    version: 'Ver.1.00',
+    version: 'Ver.1.0.1',
     loading: 'Initializing...',
   },
 
