@@ -402,6 +402,30 @@ function App() {
     }
   }
 
+  function handleExportEigenCsv(): void {
+    if (!eigenResult) return;
+    const n = eigenResult.naturalFrequency.length;
+    const rows: string[] = [];
+
+    // Summary table
+    rows.push([t.eigenMode.order, t.eigenMode.naturalFreq, t.eigenMode.effectiveMassRatio, t.eigenMode.participationFactor].join(","));
+    for (let i = 0; i < n; i++) {
+      rows.push([i + 1, eigenResult.naturalFrequency[i].toFixed(4), eigenResult.effectiveMassRatio[i].toFixed(4), eigenResult.participationFactor[i].toFixed(4)].join(","));
+    }
+
+    rows.push("");
+
+    // Eigenvector table
+    rows.push([t.eigenMode.floor, ...Array.from({ length: n }, (_, i) => `${i + 1}${t.eigenMode.orderSuffix}`)].join(","));
+    for (let fi = n - 1; fi >= 0; fi--) {
+      rows.push([`${fi + 1}${t.eigenMode.floor}`, ...eigenResult.eigenVector.map((vec) => vec[fi].toFixed(4))].join(","));
+    }
+
+    const csv = rows.join("\n") + "\n";
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    triggerDownload(blob, "eigen_result.csv");
+  }
+
   function handleGenerateSine(): void {
     const generated = makeSineWave(sineInput);
     const existing = forceWaveFiles.map((file) => fileNameFromPath(file.path));
@@ -1171,6 +1195,9 @@ function App() {
                 ))}
               </select>
               <button onClick={handleComputeEigen}>{t.eigenMode.compute}</button>
+              {eigenResult && (
+                <button onClick={handleExportEigenCsv}>{t.eigenMode.exportCsv}</button>
+              )}
             </div>
             {eigenResult && (() => {
               const n = eigenResult.naturalFrequency.length;

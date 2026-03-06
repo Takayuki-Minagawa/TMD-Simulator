@@ -63,6 +63,7 @@ export const ja: Translations = {
     modeShapeTitle: 'モード図',
     floor: '層',
     base: '基礎',
+    exportCsv: 'CSV出力',
   },
 
   sineWave: {

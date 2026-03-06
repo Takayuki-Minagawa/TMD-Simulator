@@ -61,6 +61,7 @@ export interface Translations {
     modeShapeTitle: string;
     floor: string;
     base: string;
+    exportCsv: string;
   };
 
   sineWave: {

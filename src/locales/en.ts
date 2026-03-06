@@ -63,6 +63,7 @@ export const en: Translations = {
     modeShapeTitle: 'Mode Diagram',
     floor: 'Layer',
     base: 'Base',
+    exportCsv: 'Export CSV',
   },
 
   sineWave: {
