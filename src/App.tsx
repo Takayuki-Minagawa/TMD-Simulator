@@ -144,6 +144,7 @@ function App() {
 
   const [eigenModelPath, setEigenModelPath] = useState("");
   const [eigenResult, setEigenResult] = useState<ModalResult | null>(null);
+  const [eigenChartWidth, setEigenChartWidth] = useState<number>(0);
 
   const [sineInput, setSineInput] = useState({
     freqHz: 3,
@@ -1232,75 +1233,75 @@ function App() {
                   </table>
 
                   <h3>{t.eigenMode.modeShapeTitle}</h3>
-                  <div
-                    style={{
-                      width: defaultWidth,
-                      minWidth: defaultWidth,
-                      resize: "horizontal",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Suspense
-                      fallback={
-                        <div className="empty-plot">Loading...</div>
-                      }
-                    >
-                      <Plot
-                        data={eigenResult.modeShape.map((shape, mode) => ({
-                          x: [0, ...shape],
-                          y: [
-                            0,
-                            ...Array.from({ length: n }, (_, i) => i + 1),
-                          ],
-                          mode: "lines+markers" as const,
-                          type: "scatter" as const,
-                          name: modeLabel(mode),
-                          line: {
-                            color: modeColors[mode % modeColors.length],
-                            width: 2,
-                          },
-                          marker: { size: 5 },
-                        }))}
-                        layout={{
-                          autosize: true,
-                          height: chartHeight,
-                          margin: { l: 60, r: 20, t: 30, b: 60 },
-                          paper_bgcolor: "rgba(0,0,0,0)",
-                          plot_bgcolor: "rgba(255,255,255,0.82)",
-                          xaxis: {
-                            title: { text: t.eigenMode.modeShapeTitle },
-                            zeroline: true,
-                            zerolinewidth: 2,
-                            gridcolor: "#dbe7f4",
-                          },
-                          yaxis: {
-                            title: { text: t.eigenMode.floor },
-                            dtick: 1,
-                            tick0: 0,
-                            gridcolor: "#dbe7f4",
-                          },
-                          legend: { orientation: "h" as const },
-                          shapes: [
-                            {
-                              type: "line" as const,
-                              x0: 0,
-                              x1: 0,
-                              y0: 0,
-                              y1: n,
-                              line: {
-                                color: "#888",
-                                width: 1,
-                                dash: "dash" as const,
-                              },
-                            },
-                          ],
-                        }}
-                        config={{ displaylogo: false, responsive: true }}
-                        style={{ width: "100%" }}
-                        useResizeHandler
-                      />
-                    </Suspense>
+                  <div className="row" style={{ alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: "0.85em", whiteSpace: "nowrap" }}>↔ {t.eigenMode.floor}</span>
+                    <input
+                      type="range"
+                      min={defaultWidth}
+                      max={1200}
+                      value={eigenChartWidth > 0 ? eigenChartWidth : defaultWidth}
+                      onChange={(e) => setEigenChartWidth(Number(e.target.value))}
+                      style={{ width: 140 }}
+                    />
                   </div>
+                  <Suspense
+                    fallback={
+                      <div className="empty-plot">Loading...</div>
+                    }
+                  >
+                    <Plot
+                      data={eigenResult.modeShape.map((shape, mode) => ({
+                        x: [0, ...shape],
+                        y: [
+                          0,
+                          ...Array.from({ length: n }, (_, i) => i + 1),
+                        ],
+                        mode: "lines+markers" as const,
+                        type: "scatter" as const,
+                        name: modeLabel(mode),
+                        line: {
+                          color: modeColors[mode % modeColors.length],
+                          width: 2,
+                        },
+                        marker: { size: 5 },
+                      }))}
+                      layout={{
+                        width: eigenChartWidth > 0 ? eigenChartWidth : defaultWidth,
+                        height: chartHeight,
+                        margin: { l: 60, r: 20, t: 30, b: 60 },
+                        paper_bgcolor: "rgba(0,0,0,0)",
+                        plot_bgcolor: "rgba(255,255,255,0.82)",
+                        xaxis: {
+                          title: { text: t.eigenMode.modeShapeTitle },
+                          zeroline: true,
+                          zerolinewidth: 2,
+                          gridcolor: "#dbe7f4",
+                        },
+                        yaxis: {
+                          title: { text: t.eigenMode.floor },
+                          dtick: 1,
+                          tick0: 0,
+                          gridcolor: "#dbe7f4",
+                        },
+                        legend: { orientation: "h" as const },
+                        shapes: [
+                          {
+                            type: "line" as const,
+                            x0: 0,
+                            x1: 0,
+                            y0: 0,
+                            y1: n,
+                            line: {
+                              color: "#888",
+                              width: 1,
+                              dash: "dash" as const,
+                            },
+                          },
+                        ],
+                      }}
+                      config={{ displaylogo: false, responsive: true }}
+                    />
+                  </Suspense>
                 </>
               );
             })()}

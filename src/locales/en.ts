@@ -60,7 +60,7 @@ export const en: Translations = {
     participationFactor: 'Participation Factor',
     orderSuffix: '',
     eigenVectorTitle: 'Eigenvectors (max=1.0 normalized)',
-    modeShapeTitle: 'Stimulation Function Mode Diagram',
+    modeShapeTitle: 'Mode Diagram',
     floor: 'Layer',
     base: 'Base',
   },

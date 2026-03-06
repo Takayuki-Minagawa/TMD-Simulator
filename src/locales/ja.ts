@@ -60,7 +60,7 @@ export const ja: Translations = {
     participationFactor: '刺激係数',
     orderSuffix: '次',
     eigenVectorTitle: '固有ベクトル (最大値1.0基準化)',
-    modeShapeTitle: '刺激関数モード図',
+    modeShapeTitle: 'モード図',
     floor: '層',
     base: '基礎',
   },
