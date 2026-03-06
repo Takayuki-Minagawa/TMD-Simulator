@@ -181,10 +181,12 @@ export function serializeResponseCsv(result: ResponseResult): string {
   const tmdN = result.tmdCount;
   const headers = ["Time[s]", "入力波[gal]"];
   for (let i = 0; i < mainN; i += 1) {
-    headers.push(`A_${i + 2}F(gal)`);
+    const fl = i === mainN - 1 ? "RF" : `${i + 2}F`;
+    headers.push(`A_${fl}(gal)`);
   }
   for (let i = 0; i < mainN; i += 1) {
-    headers.push(`D_${i + 2}F(cm)`);
+    const fl = i === mainN - 1 ? "RF" : `${i + 2}F`;
+    headers.push(`D_${fl}(cm)`);
   }
   for (let i = 0; i < tmdN; i += 1) {
     const floor = result.tmdFloors[i] ?? i + 1;
