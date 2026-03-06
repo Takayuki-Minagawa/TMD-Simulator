@@ -422,7 +422,7 @@ function App() {
     }
 
     const csv = rows.join("\n") + "\n";
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
     triggerDownload(blob, "eigen_result.csv");
   }
 
