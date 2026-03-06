@@ -416,6 +416,7 @@ function App() {
     rows.push("");
 
     // Eigenvector table
+    rows.push(t.eigenMode.eigenVectorTitle);
     rows.push([t.eigenMode.floor, ...Array.from({ length: n }, (_, i) => `${i + 1}${t.eigenMode.orderSuffix}`)].join(","));
     for (let fi = n - 1; fi >= 0; fi--) {
       rows.push([`${fi + 1}${t.eigenMode.floor}`, ...eigenResult.eigenVector.map((vec) => vec[fi].toFixed(4))].join(","));
